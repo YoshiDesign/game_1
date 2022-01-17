@@ -6,66 +6,67 @@ public class Player : MonoBehaviour
 {
     private Quaternion currentRotation;
     private Vector3 currentRotationAngles;
+    float currentRotationZ;
 
     [SerializeField]
-    private float speed = 13.5f;
+    private float speed = 90.0f;
     [SerializeField]
     private GameObject _laserPrefab;
 
+    public float fire_rate = 0.5f;
+    public float can_fire = -1.0f;
+
     public float tilt_speed = 113.0f;
     public float pitch_speed = 5.0f;
-    public float horizontalInput = 0.0f;
-    public float verticalInput = 0.0f;
+    public Vector2 _input;
 
     void Start()
     {
-        transform.position = new Vector3(0, 0, 0);
+        transform.position = new Vector3(0, 50, 0);
     }
 
     void Update()
     {
         CalculateMovement();
-
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            Instantiate(_laserPrefab, transform.position, Quaternion.identity);
+        if (Input.GetKeyDown(KeyCode.Space) && Time.time > can_fire)
+        { 
+            shootLaser();
         }
+            
     }
 
     void CalculateMovement()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
-        verticalInput = Input.GetAxis("Vertical");
+        _input.x = Input.GetAxis("Horizontal");
+        _input.y = Input.GetAxis("Vertical");
 
         //Debug.Log("H: " + horizontalInput);
         //Debug.Log("V: " + verticalInput);
 
-        if (horizontalInput > 0.0f || horizontalInput < 0.0f) CalculateADMovement(horizontalInput, verticalInput);
-        if (verticalInput > 0.0f || verticalInput < 0.0f) CalculateWSMovement(horizontalInput, verticalInput);
+        if (_input.x > 0.0f || _input.x < 0.0f) CalculateADMovement(_input.x, _input.y);
+        if (_input.y > 0.0f || _input.y < 0.0f) CalculateWSMovement(_input.x, _input.y);
     }
 
-    void CalculateADMovement(float horizontalInput, float verticalInput)
+    void CalculateADMovement(float _x, float _y)
     {
-        currentRotationAngles = transform.rotation.eulerAngles;
-        currentRotationAngles.z += (-horizontalInput * tilt_speed * Time.deltaTime);
+        currentRotationZ = transform.localEulerAngles.z + (-_x * tilt_speed * Time.deltaTime);
 
-        Debug.Log("Current R-Z: " + currentRotationAngles.z);
+        if (currentRotationZ > 15
+            && currentRotationZ < 345
+            && _x < 0) currentRotationZ = 15;
+        if (currentRotationZ < 345 
+            && currentRotationZ > 15
+            && _x > 0) currentRotationZ = 345;
 
-        if (currentRotationAngles.z > 15
-            && currentRotationAngles.z < 355
-            && horizontalInput < 0) currentRotationAngles.z = 15;
-        if (currentRotationAngles.z < 355 
-            && currentRotationAngles.z > 15
-            && horizontalInput > 0) currentRotationAngles.z = 345;
-
-        transform.Translate(new Vector3(horizontalInput, verticalInput, 0) * speed * Time.deltaTime);
-        transform.rotation = Quaternion.AngleAxis(currentRotationAngles.z, Vector3.forward);
+        transform.Translate(new Vector3(_x, 0, 0) * speed * Time.deltaTime, Space.World);
+        transform.rotation = Quaternion.AngleAxis(currentRotationZ, Vector3.forward);
 
         // Movement
-        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 3.8f), 0);
+        transform.position = new Vector3(transform.position.x, transform.position.y, 0);
         
     }
     
-    void CalculateWSMovement(float horizontalInput, float verticalInput)
+    void CalculateWSMovement(float _x, float _y)
     {
         currentRotation = transform.rotation;
         currentRotationAngles = currentRotation.eulerAngles;
@@ -74,8 +75,17 @@ public class Player : MonoBehaviour
         currentRotationAngles += new Vector3(pitch_speed * Time.deltaTime, 0, currentRotationAngles.z);
         currentRotation.eulerAngles = currentRotationAngles;
         // Movement
-        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 3.8f), 0);
+        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, 1.0f, 50.0f), 0);
 
 
     }
+
+    void shootLaser()
+    {
+
+        can_fire = Time.time + fire_rate;
+        Instantiate(_laserPrefab, transform.position, Quaternion.identity);
+       
+    }
+
 }
