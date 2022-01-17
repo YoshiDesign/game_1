@@ -7,9 +7,9 @@ public class GameSystem : MonoBehaviour
     public int cols = 4;
     public int rows = 3;
 
-    public GameObject tq_prefab;
+    public Terrain_Quadrant tq_prefab;
     private Dictionary<string, (int, int)> quadrant_lookup = new Dictionary<string, (int, int)>();
-    public GameObject[,] grid = new GameObject[3, 4];
+    public Terrain_Quadrant[,] grid = new Terrain_Quadrant[3, 4];
 
     private void Start()
     {
@@ -37,7 +37,9 @@ public class GameSystem : MonoBehaviour
                     case 2: offset_zed = 0.0f;    break;
                 }
 
-                grid[i,j] = Instantiate(tq_prefab, new Vector3(offset_left, 0.0f, offset_zed), Quaternion.identity);
+                Terrain_Quadrant clone = Instantiate(tq_prefab, new Vector3(offset_left, 0.0f, offset_zed), Quaternion.identity);
+                
+                grid[i, j] = clone;
             }
 
         }

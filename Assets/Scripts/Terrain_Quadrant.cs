@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Terrain_Quadrant : MonoBehaviour
 {
+
+    public int color;
     // Start is called before the first frame update
     void Start()
     {
