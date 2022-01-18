@@ -10,7 +10,7 @@ public class Laser : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position += new Vector3(0, 0, speed * Time.deltaTime);
+        transform.Translate(new Vector3(0,0, speed * Time.deltaTime), Space.Self);
 
         if (transform.position.z > max_dist) {
             Destroy(gameObject);
