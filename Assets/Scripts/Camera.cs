@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Camera : MonoBehaviour
@@ -8,7 +6,6 @@ public class Camera : MonoBehaviour
     public float radius = 30.0f;
 
     private float cameraAngleLag = 89.0f;
-    float rotationDelta = 0.0f;
     private Vector2 _input;
     // Start is called before the first frame update
     void Start()
