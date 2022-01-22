@@ -7,28 +7,27 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _laserPrefab;
 
-    private float currentRotationZ = 0.0f;
-    private float currentRotationY = 0.0f;
-    private float currentRotationX = 0.0f;
-
-    float attenuateFromDegree = 0.0f;
-
     public float speedX = 125.0f;
     public float speedY = 110.0f;
+    public Vector2 dir;
+    private Vector3 current_velocity;
+    public Vector3 current_rotation;
 
     // Maximum roll the player can achieve. Effects speed
-    public float max_momentum = 15.0f;
-    float momentumX = 0.0f;
-    float momentumY = 0.0f;
-    float drift = 0.0f;     // Rate of roll speed increase
+    private float max_momentum = 15.0f;
+    private float max_rotation = 15.0f;
+    private Vector2 momentum;
+
+    float drift = 0.0f;     // Rate of roll speed increase [UNUSED]
+
     public float fire_rate = 0.5f;
     public float can_fire = -1.0f;
     public float tilt_speed = 25.0f;
     public float pitch_speed = 5.0f;
     public bool lock_velocity = false;
-    public Vector2 dir;
-    private Vector3 current_velocity;
-    private Vector3 current_rotation;
+
+    [SerializeField]
+    private AudioSource _laser_sound;
 
     void Start()
     {
@@ -44,97 +43,63 @@ public class Player : MonoBehaviour
         }
             
     }
-    // Return a speed variable given the current angle of roll.
-    float getMomentum(string axis)
-    {
-        if (axis == "X") {
-            // When steering right
-            if (currentRotationZ > 16)
-            {
-                //Debug.Log("Current RotationZ: " + currentRotationZ);
-                return 360.0f - currentRotationZ;
-            }
 
-            // When steering left
-            return currentRotationZ * -1;
-        }
-
-        if (axis == "Y") {
-            // When steering right
-            if (currentRotationX > 16)
-            {
-                //Debug.Log("Current RotationX: " + currentRotationX);
-                return 360.0f - currentRotationX;
-            }
-
-            // When steering left
-            return currentRotationX * -1;
-        }
-
-        return 0.0f;
-
-    }
     void CalculateMovement()
     {
         dir.x = Input.GetAxisRaw("Horizontal");
         dir.y = Input.GetAxisRaw("Vertical");
 
-        momentumX = getMomentum("X");
-        momentumY = getMomentum("Y");
+        // Velocity augmentation based on pitch and roll
+        getMomentum();
+        // 
+        CalculateADRotation(dir.x, dir.y);
+        CalculateWSRotation(dir.x, dir.y);
 
-        if (dir.x != 0.0f)
-        {
-            CalculateADRotation(dir.x, dir.y);
+        // Continue moving X based on our momentum given by angle of rotation
+        current_velocity.x = ((speedX / max_momentum) * momentum.x) * Time.deltaTime;
 
-            // Don't roll until momentum and direction are pointing in the same direction
-            if ((dir.x < 0.0f && momentumX < 0.0f) || (dir.x > 0.0f && momentumX > 0.0f))
-                current_velocity.x = dir.x * speedX  * Time.deltaTime;
+        // Continue moving Y based on our momentum given by angle of pitch
+        current_velocity.y = ((speedY / max_momentum) * momentum.y) * Time.deltaTime;
 
-        }
-        else if (momentumX != 0.0f) {
-            
-            current_velocity.x = (momentumX / Mathf.Abs(momentumX)) * ((speedX - max_momentum) + momentumX) * Time.deltaTime;
-        }
-        if (dir.y != 0.0f)
-        {
-            CalculateWSRotation(dir.x, dir.y);
-            // Don't pitch until momentum and direction are pointing in the same direction
-            if ((dir.y < 0.0f && momentumY < 0.0f) || (dir.y > 0.0f && momentumY > 0.0f))
-                current_velocity.y = dir.y * speedY * Time.deltaTime;
-        }
-        else if (momentumY != 0.0f) {
-            current_velocity.y = (momentumY / Mathf.Abs(momentumY)) * ((speedY - max_momentum) + momentumY) * Time.deltaTime;
-        }
-
-        current_rotation.x = currentRotationX;
-        current_rotation.y = currentRotationY;
-        current_rotation.z = currentRotationZ;
-
-        Debug.Log("D.X : " + dir.x);
-        Debug.Log("D.Y : " + dir.y);
-        Debug.Log("momY : " + momentumY);
-        Debug.Log("momX : " + momentumX);
-
-        transform.rotation = Quaternion.Euler(current_rotation);
+        transform.localEulerAngles = new Vector3(current_rotation.x, current_rotation.y, current_rotation.z);
         transform.Translate(current_velocity, Space.World);
 
     }
+    /* 
+     * Return an additive speed coeff given the current angle of roll.
+     * The steeper your angle, the faster you move.
+     * The ship won't move to the left while it's tilting to the right,
+     * and the further to the right it's tilting, the faster it will move to the right
+     * 
+     * Value is currently always be between -15 and 15
+     */
+    void getMomentum()
+    {
 
+        // When steering
+        if (current_rotation.z > 16) momentum.x = 360.0f - current_rotation.z;
+        else momentum.x = current_rotation.z * -1;
+
+        // When pitching
+        if (current_rotation.x > 16) momentum.y = 360.0f - current_rotation.x;
+        else momentum.y = current_rotation.x * -1;
+
+    }
     // Roll
     void CalculateADRotation(float _x, float _y)
     {
         // New angles about Z and Y axes
-        currentRotationZ = rotate_player(transform.localEulerAngles.z, -_x, "Z");
-        currentRotationY = rotate_player(transform.localEulerAngles.y, _x, "Y");
+        current_rotation.z = rotate_player(transform.localEulerAngles.z, -_x, "Z");
+        current_rotation.y = rotate_player(transform.localEulerAngles.y, _x, "Y");
     }
 
     // Pitch
     void CalculateWSRotation(float _x, float _y)
     {
         // New angle about X axis
-        currentRotationX = rotate_player(transform.localEulerAngles.x, -_y, "X");
+        current_rotation.x = rotate_player(transform.localEulerAngles.x, -_y, "X");
     }
-
+    // Bang
     void shootLaser()
     {
         // Reset cooldown
@@ -148,6 +113,7 @@ public class Player : MonoBehaviour
         
         angle = angle + ((magnitude) * tilt_speed * Time.deltaTime);
 
+        // Lock the maximum rotation
         if (angle > 15 && angle < 345)
         {
             // TODO condense theses when optimizing. This just helps me debug
@@ -160,8 +126,6 @@ public class Player : MonoBehaviour
             else if (which == "X" && magnitude < 0) angle = 345;
 
         }
-
-        //Debug.Log(which + " : " + angle + " : " + magnitude);
 
         return angle;
     }
