@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
     [SerializeField]
     private GameObject _laserPrefab;
+    PlayerInputActions playerInputActions;
 
     public float speedX = 125.0f;
     public float speedY = 110.0f;
@@ -17,38 +19,60 @@ public class Player : MonoBehaviour
     private float max_momentum = 15.0f;
     private float max_rotation = 15.0f;
     private Vector2 momentum;
+    private int lives = 3;
 
     float drift = 0.0f;     // Rate of roll speed increase [UNUSED]
-
-    public float fire_rate = 0.5f;
-    public float can_fire = -1.0f;
     public float tilt_speed = 25.0f;
     public float pitch_speed = 5.0f;
     public bool lock_velocity = false;
 
-    [SerializeField]
     private AudioSource _laser_sound;
+
+    private void Awake()
+    {
+        playerInputActions = new PlayerInputActions();
+        playerInputActions.Player.Enable();
+        playerInputActions.Player.Shoot.performed += shootLaser;
+    }
+
+    
 
     void Start()
     {
+        dir = new Vector2(0f, 0f);
         transform.position = new Vector3(0, 50, 0);
+        _laser_sound = transform.GetComponent<AudioSource>();
     }
 
-    void Update()
+    private void Update()
     {
+        dir = playerInputActions.Player.Movement.ReadValue<Vector2>();
+    }
+
+    void FixedUpdate()
+    {
+
+        
         CalculateMovement();
-        if (Input.GetKeyDown(KeyCode.Space) && Time.time > can_fire)
-        { 
-            shootLaser();
+
+        if (lives == 0)
+        {
+            GameSystem gs = GameObject.Find("GameSystem").GetComponent<GameSystem>();
+            gs.GameOver();
         }
-            
+
     }
 
-    void CalculateMovement()
-    {
-        dir.x = Input.GetAxisRaw("Horizontal");
-        dir.y = Input.GetAxisRaw("Vertical");
+    //public void MovePlayer(InputAction.CallbackContext context)
+    //{
+    //    dir = context.ReadValue<Vector2>();
+    //    Debug.Log("At position: (" + dir.x + ", " + dir.y + ")");
 
+    //}
+
+    public void CalculateMovement()
+    {
+        
         // Velocity augmentation based on pitch and roll
         getMomentum();
         // 
@@ -100,12 +124,10 @@ public class Player : MonoBehaviour
         current_rotation.x = rotate_player(transform.localEulerAngles.x, -_y, "X");
     }
     // Bang
-    void shootLaser()
+    public void shootLaser(InputAction.CallbackContext ctx)
     {
-        // Reset cooldown
-        can_fire = Time.time + fire_rate;
         Instantiate(_laserPrefab, transform.position, transform.localRotation);
-       
+        _laser_sound.Play();
     }
 
     float rotate_player(float angle, float magnitude, string which)

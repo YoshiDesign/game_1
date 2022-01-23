@@ -10,8 +10,10 @@ public class Laser : MonoBehaviour
     {
         transform.Translate(new Vector3(0,0, speed * Time.deltaTime), Space.Self);
 
-        if (transform.position.z > max_dist) {
+        if (transform.position.z > max_dist)
+        {
             Destroy(gameObject);
         }
+        else {; }
     }
 }

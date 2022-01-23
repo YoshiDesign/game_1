@@ -5,27 +5,43 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
 
-    public float speed = 4.0f;
-    public float next_speed = 0.0f;
+    public Vector3 velocity;
 
     // Start is called before the first frame update
     void Start()
     {
-        transform.position = new Vector3(transform.position.x, 50, 100.0f);
+        velocity = new Vector3(0f, 0f, Random.Range(1f, -600f));
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (next_speed < Time.time) {
-            speed = Random.Range(-5.0f, 5.0f);
-            next_speed = Time.time + 3.0f;
-        }
-        transform.Rotate(Vector3.forward * speed * Time.deltaTime);
+        Move();
+        CheckDestroy();
     }
 
-    bool checkDamage()
+    private void Move()
+    {
+        transform.Translate(velocity);
+    }
+    private void CheckDestroy() 
+    {
+
+        if (transform.position.z < -100.0f) {
+            GameObject.Destroy(this.gameObject);
+        }
+
+    }
+    private bool checkDamage()
     {
         return false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Hit");
+        if (other.tag == "Laser" || other.tag == "Player") {
+            Destroy(this.gameObject);
+        }
     }
 }

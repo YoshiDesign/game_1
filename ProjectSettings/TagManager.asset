@@ -4,7 +4,8 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - TerrainRow
+  - Enemy
+  - Laser
   layers:
   - Default
   - TransparentFX
