@@ -9,16 +9,18 @@ public class Camera : MonoBehaviour
 
     private float cameraAngleLag = 89.0f;
     private Vector2 _input;
-    // Start is called before the first frame update
+    
     void Start()
     {
         offset = new Vector3(0f, height, radius);
         player = GameObject.Find("Player").GetComponent<Player>();
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
+        // Keep the camera behind the player
+
         // Remember that the player's X momentum should govern the camera's (and the player's, while we're here) Y rotation
         transform.rotation = Quaternion.AngleAxis(player.momentum.x, Vector3.up);
         transform.position = player.transform.TransformPoint(Vector3.forward * -5) + offset;

@@ -29,6 +29,7 @@ public class Player : MonoBehaviour
     public bool lock_velocity = false;
 
     private AudioSource _laser_sound;
+    private Gamepad gamepad;
 
     private void Awake()
     {
@@ -37,32 +38,39 @@ public class Player : MonoBehaviour
         playerInputActions.Player.Shoot.performed += shootLaser;
     }
 
-    
+    /**
+     * 
+     * 
+     * 
+     * 
+     * 
+     * TODO
+     * 
+     * Check for gamepad
+     * If gamepad, attenuate rotation?
+     * 
+     * 
+     * 
+     * 
+     */
 
     void Start()
     {
         dir = new Vector2(0f, 0f);
         transform.position = new Vector3(0, 50, 0);
         _laser_sound = transform.GetComponent<AudioSource>();
+
+        gamepad = null;
+        if (Gamepad.current != null) { 
+            gamepad = Gamepad.current;
+            Debug.Log("Gamepad Detected");
+        
+        }
     }
 
     private void Update()
     {
-        tmp_dir = playerInputActions.Player.Movement.ReadValue<Vector2>();
-
-        // Because Touchscreen input delta can be > 1 but gamepad and keyboard can't be > 1 ..wtf
-        if (tmp_dir.x != 0.0f)
-        {
-            dir.x = Mathf.Abs(tmp_dir.x) / tmp_dir.x;
-        }
-        else dir.x = 0.0f;
-
-        if (tmp_dir.y != 0.0f)
-        {
-            dir.y = Mathf.Abs(tmp_dir.y) / tmp_dir.y;
-        }
-        else dir.y = 0.0f;
-
+        dir = playerInputActions.Player.Movement.ReadValue<Vector2>();
     }
 
     void FixedUpdate()
@@ -78,21 +86,12 @@ public class Player : MonoBehaviour
 
     }
 
-    //public void MovePlayer(InputAction.CallbackContext context)
-    //{
-    //    dir = context.ReadValue<Vector2>();
-    //    Debug.Log("At position: (" + dir.x + ", " + dir.y + ")");
-
-    //}
-
     public void CalculateMovement()
     {
         
         // Velocity augmentation based on pitch and roll
         getMomentum();
-        // 
-        CalculateADRotation(dir.x, dir.y);
-        CalculateWSRotation(dir.x, dir.y);
+        CalculateRotation(dir.x, dir.y);
 
         // Continue moving X based on our momentum given by angle of rotation
         current_velocity.x = ((speedX / max_momentum) * momentum.x) * Time.deltaTime;
@@ -104,7 +103,7 @@ public class Player : MonoBehaviour
         transform.Translate(current_velocity, Space.World);
 
     }
-    /* 
+    /** 
      * Return an additive speed coeff given the current angle of roll.
      * The steeper your angle, the faster you move.
      * The ship won't move to the left while it's tilting to the right,
@@ -116,28 +115,36 @@ public class Player : MonoBehaviour
     {
 
         // When steering
-        if (current_rotation.z > 16) momentum.x = 360.0f - current_rotation.z;
-        else momentum.x = current_rotation.z * -1;
+        if (current_rotation.z > 16)
+        {
+            momentum.x = 360.0f - current_rotation.z;
+        }
+        else { 
+            momentum.x = current_rotation.z * -1; 
+        }
 
         // When pitching
-        if (current_rotation.x > 16) momentum.y = 360.0f - current_rotation.x;
-        else momentum.y = current_rotation.x * -1;
+        if (current_rotation.x > 16)
+        {
+            momentum.y = 360.0f - current_rotation.x;
+        }
+        else { 
+            momentum.y = current_rotation.x * -1; 
+        }
 
     }
     // Roll
-    void CalculateADRotation(float _x, float _y)
+    void CalculateRotation(float _x, float _y)
     {
         // New angles about Z and Y axes
-        current_rotation.z = rotate_player(transform.localEulerAngles.z, -_x, "Z");
-        current_rotation.y = rotate_player(transform.localEulerAngles.y, _x, "Y");
+        if (_x != 0.0f) { 
+            current_rotation.z = rotate_player(transform.localEulerAngles.z, -_x, "Z");
+            current_rotation.y = rotate_player(transform.localEulerAngles.y, _x, "Y");
+        }
+        if (_y != 0.0f)
+            current_rotation.x = rotate_player(transform.localEulerAngles.x, -_y, "X");
     }
 
-    // Pitch
-    void CalculateWSRotation(float _x, float _y)
-    {
-        // New angle about X axis
-        current_rotation.x = rotate_player(transform.localEulerAngles.x, -_y, "X");
-    }
     // Bang
     public void shootLaser(InputAction.CallbackContext ctx)
     {
@@ -145,26 +152,28 @@ public class Player : MonoBehaviour
         _laser_sound.Play();
     }
 
+    /**
+     * @function rotate_player
+     * @param float angle
+     * @param float magnitude
+     * @param string which
+     * Do not change this implementation- Different controller inputs behave differently
+     */
     float rotate_player(float angle, float magnitude, string which)
     {
-        
-        angle = angle + ((magnitude) * tilt_speed * Time.deltaTime);
 
-        // Lock the maximum rotation
-        if (angle > 15 && angle < 345)
+        float abs_angle = Mathf.Abs(angle + ((magnitude) * tilt_speed * Time.deltaTime));
+
+        if (abs_angle >= 15f && abs_angle < 200f)
         {
-            // TODO condense theses when optimizing. This just helps me debug
-            if      (which == "Y" && magnitude > 0) angle = 15;
-            else if (which == "Z" && magnitude > 0) angle = 15;
-            else if (which == "X" && magnitude > 0) angle = 15;
-
-            if      (which == "Y" && magnitude < 0) angle = 345;
-            else if (which == "Z" && magnitude < 0) angle = 345;
-            else if (which == "X" && magnitude < 0) angle = 345;
-
+            return angle;
+        }
+        else if (abs_angle <= 345f && abs_angle > 300f) {
+            return angle;
         }
 
-        return angle;
+        return angle + ((magnitude) * tilt_speed * Time.deltaTime);
+
     }
 
 }

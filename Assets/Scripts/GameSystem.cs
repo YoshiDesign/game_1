@@ -11,6 +11,9 @@ public class GameSystem : MonoBehaviour
     private GameObject _terrainRowPrefab;
     private Queue<GameObject> rows = new Queue<GameObject>();
 
+    public int no_enemies;
+    GameObject[] gos;
+
     [SerializeField]
     private GameObject enemySystem;
     EnemySystem es;
@@ -44,6 +47,8 @@ public class GameSystem : MonoBehaviour
         rows.Dequeue();
         rows.Enqueue(Instantiate(_terrainRowPrefab, new Vector3(0, 0, max_distance), Quaternion.identity));
         es.Spawn();
+        gos = GameObject.FindGameObjectsWithTag("Enemy");
+        no_enemies = gos.Length;
     }
 
     public void GameOver()
