@@ -23,6 +23,7 @@ public class UIVirtualJoystick : MonoBehaviour, IPointerDownHandler, IDragHandle
 
     void Start()
     {
+        Debug.Log("VIRTUAL JOY");
         SetupHandle();
     }
 

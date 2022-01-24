@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityStandardAssets.CrossPlatformInput;
 
 public class Player : MonoBehaviour
 {
@@ -11,14 +12,15 @@ public class Player : MonoBehaviour
 
     public float speedX = 125.0f;
     public float speedY = 110.0f;
+    public Vector2 tmp_dir;
     public Vector2 dir;
-    private Vector3 current_velocity;
+    public Vector3 current_velocity;
     public Vector3 current_rotation;
 
     // Maximum roll the player can achieve. Effects speed
-    private float max_momentum = 15.0f;
-    private float max_rotation = 15.0f;
-    private Vector2 momentum;
+    public float max_momentum = 15.0f;
+    public float max_rotation = 15.0f;
+    public Vector2 momentum;
     private int lives = 3;
 
     float drift = 0.0f;     // Rate of roll speed increase [UNUSED]
@@ -46,12 +48,25 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        dir = playerInputActions.Player.Movement.ReadValue<Vector2>();
+        tmp_dir = playerInputActions.Player.Movement.ReadValue<Vector2>();
+
+        // Because Touchscreen input delta can be > 1 but gamepad and keyboard can't be > 1 ..wtf
+        if (tmp_dir.x != 0.0f)
+        {
+            dir.x = Mathf.Abs(tmp_dir.x) / tmp_dir.x;
+        }
+        else dir.x = 0.0f;
+
+        if (tmp_dir.y != 0.0f)
+        {
+            dir.y = Mathf.Abs(tmp_dir.y) / tmp_dir.y;
+        }
+        else dir.y = 0.0f;
+
     }
 
     void FixedUpdate()
     {
-
         
         CalculateMovement();
 

@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        velocity = new Vector3(0f, 0f, Random.Range(1f, -600f));
+        velocity = new Vector3(0f, 0f, Random.Range(-1f, -10f));
     }
 
     // Update is called once per frame
@@ -27,21 +27,13 @@ public class Enemy : MonoBehaviour
     private void CheckDestroy() 
     {
 
-        if (transform.position.z < -100.0f) {
+        if (transform.position.z < -100.0f || transform.position.z > 5000.0f) {
             GameObject.Destroy(this.gameObject);
         }
 
     }
-    private bool checkDamage()
+    public void Destroyed()
     {
-        return false;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Hit");
-        if (other.tag == "Laser" || other.tag == "Player") {
-            Destroy(this.gameObject);
-        }
+        Destroy(this.gameObject);
     }
 }

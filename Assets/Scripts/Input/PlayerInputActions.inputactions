@@ -11,8 +11,7 @@
                     "id": "2bd0ee0e-149a-4b2f-9191-2deb152c7cd6",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
+                    "interactions": ""
                 },
                 {
                     "name": "Movement",
@@ -20,8 +19,7 @@
                     "id": "ee6592ae-bcba-4ec5-bf71-1038bf4956b2",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -43,6 +41,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
+                    "action": "Shoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7d0d51bf-82ff-49fe-9d0e-b6c7623adc24",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
                     "action": "Shoot",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -103,23 +112,23 @@
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "2D Vector",
-                    "id": "229dab5f-ac8a-4e54-a929-126a8982ea46",
-                    "path": "2DVector",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Movement",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
                     "name": "",
                     "id": "78e75fd8-1edf-4564-99dd-f69f86fe7de1",
                     "path": "<Gamepad>/leftStick",
                     "interactions": "",
                     "processors": "StickDeadzone,NormalizeVector2",
                     "groups": "Gamepad",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "02894567-adb7-4a31-9fbd-0578285cca9b",
+                    "path": "<Touchscreen>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touch_Screen",
                     "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -136,8 +145,7 @@
                     "id": "cf353dda-8726-4bf5-bd64-f8ece2fb37a6",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
+                    "interactions": ""
                 },
                 {
                     "name": "PrevItem",
@@ -145,8 +153,7 @@
                     "id": "f2a9227a-3906-4aa9-83e9-7499ac30d252",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -226,6 +233,17 @@
             "devices": [
                 {
                     "devicePath": "<Gamepad>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "Touch_Screen",
+            "bindingGroup": "Touch_Screen",
+            "devices": [
+                {
+                    "devicePath": "<Touchscreen>",
                     "isOptional": false,
                     "isOR": false
                 }
