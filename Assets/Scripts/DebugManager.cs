@@ -7,26 +7,23 @@ public class DebugManager : MonoBehaviour
 {
     [SerializeField]
     private GameObject player;
-    [SerializeField]
-    private GameObject touchHandler ;
+    //[SerializeField]
+    //private GameObject touchHandler ;
     [SerializeField]
     private GameObject gameSystem;
 
     private GameSystem _sys;
-    private TouchHandler _touch;
+    //private TouchHandler _touch;
     private Player _player;
     private Text text;
 
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Debug ???");
-        _touch = touchHandler.GetComponent<TouchHandler>();
+        //_touch = touchHandler.GetComponent<TouchHandler>();
         text = transform.GetComponent<Text>();
         _player = player.GetComponent<Player>();
         _sys = gameSystem.GetComponent<GameSystem>();
-
-
     }
 
     // Update is called once per frame
@@ -40,8 +37,8 @@ public class DebugManager : MonoBehaviour
         text.text += "\nRotation: "  + c_rotation.ToString();
         text.text += "\nPos: "       + _player.transform.position.ToString();
         text.text += "\n\nTouch Debug: ";
-        text.text += "\nActive: "    + _touch.touchPosition.ToString();
-        text.text += "\nDelta: "     + _touch.touchDelta.ToString();
+        //text.text += "\nActive: "    + _touch.touchPosition.ToString();
+        //text.text += "\nDelta: "     + _touch.touchDelta.ToString();
         text.text += "\n\nObjects: " + _sys.no_enemies;
     }
 }

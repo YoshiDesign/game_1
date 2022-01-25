@@ -6,14 +6,13 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.OnScreen;
 
-public class OnScreenCustomStick : OnScreenControl, IPointerDownHandler, IPointerUpHandler, IDragHandler
+public class OnScreenCustomStick : OnScreenControl, IPointerDownHandler, IPointerUpHandler
 {
     // Start is called before the first frame update
     void Start()
     {
         Debug.Log("Started onscreen stick");
         m_StartPos = Touchscreen.current.primaryTouch.position.ReadValue();
-        delta = new Vector2(0, 0);
     }
 
     // Update is called once per frame
@@ -27,30 +26,15 @@ public class OnScreenCustomStick : OnScreenControl, IPointerDownHandler, IPointe
         SendValueToControl(0.0f);
     }
 
-    public void OnDrag(PointerEventData data)
-    {
-        //Debug.Log("Event Data: " + data.ToString());
-
-        //RectTransformUtility.ScreenPointToLocalPointInRectangle(transform.parent.GetComponentInParent<RectTransform>(), data.position, data.pressEventCamera, out var position);
-        //var delta = new Vector2(0, 0);
-
-        //delta = Vector2.ClampMagnitude(delta, movementRange);
-        //((RectTransform)transform).anchoredPosition = (Vector2)m_StartPos;
-
-        //var newPos = new Vector2(delta.x / movementRange, delta.y / movementRange);
-        //SendValueToControl(newPos);
-    }
-
-    public void _onDrag(PointerEventData data, Vector3 _position, Vector2 _delta) {
+    public void _onDrag(PointerEventData data, Vector2 _delta) {
         Debug.Log("Event Data: " + data.ToString());
-        
+
 
         //RectTransformUtility.Screen(transform.parent.GetComponentInParent<RectTransform>(), _position, data.pressEventCamera, out var position);
 
-        delta = Vector2.ClampMagnitude(_delta, movementRange);
-        ((RectTransform)transform).anchoredPosition = delta;
+        ((RectTransform)transform).anchoredPosition = _delta;
 
-        var newPos = new Vector2(delta.x / movementRange, delta.y / movementRange);
+        var newPos = new Vector2(_delta.x / movementRange, _delta.y / movementRange);
         SendValueToControl(newPos);
     }
 

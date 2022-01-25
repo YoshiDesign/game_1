@@ -6,15 +6,24 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.OnScreen;
 
+/**
+ * Currently referenced by the Canvas Object
+ */ 
+
 public class TouchHandler : MonoBehaviour
 {
-    public Vector2 touchPosition;
-    public Vector2 touchDelta;
+    private Vector2 touchPosition;
+    private Vector2 touchDelta;
 
-    public GameObject stick;
-    public GameObject toggle;
+    [SerializeField]
+    private GameObject stick;
+    [SerializeField]
+    private GameObject toggle;
+
     private OnScreenCustomStick _toggle;
     private bool stick_is_active;
+    [SerializeField]
+    private float _attenuation_control = 7.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +42,7 @@ public class TouchHandler : MonoBehaviour
             if (stick_is_active)
                 stick_is_active = false;
             return;
+
         } else
         {
 
@@ -47,16 +57,17 @@ public class TouchHandler : MonoBehaviour
                     stick.transform.position = touchPosition;
                 }
 
+                touchDelta = Vector2.ClampMagnitude((touchDelta + Touchscreen.current.delta.ReadValue() / _attenuation_control), 50.0f);
+
+                // Obtain the current event data and pass it to the mobile Joystick
                 PointerEventData d = new PointerEventData(EventSystem.current);
                 _toggle = toggle.GetComponent<OnScreenCustomStick>();
-                _toggle._onDrag(d, touchPosition,Touchscreen.current.delta.ReadValue());
+                _toggle._onDrag(d, touchDelta);
 
                 stick_is_active = true;
 
             }
         }
-
-        touchDelta = Touchscreen.current.delta.ReadValue();
 
         //if (touchDelta.x > 0.0f) {
         //    print("Swipe right");

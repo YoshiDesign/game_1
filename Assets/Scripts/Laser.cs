@@ -6,6 +6,13 @@ public class Laser : MonoBehaviour
 {
     public float speed = 1200.0f;
     public float max_dist = 5500.0f;
+    public ParticleSystem _smoke;
+
+    private void Start()
+    {
+        _smoke = transform.GetComponent<ParticleSystem>();
+
+    }
 
     // Update is called once per frame
     void Update()
@@ -20,7 +27,9 @@ public class Laser : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        
         RaycastHit hit;
+
 
         if (Physics.Raycast(transform.position, transform.forward, out hit, 50.0f)) { 
             //Debug.Log("Hit! Distance: " + hit.distance);
