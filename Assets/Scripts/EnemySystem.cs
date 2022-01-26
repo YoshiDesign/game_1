@@ -6,6 +6,10 @@ public class EnemySystem : MonoBehaviour
 {
     [SerializeField]
     private GameObject enemy;
+
+    [SerializeField]
+    private GameObject mothership;
+
     [SerializeField]
     private float max_spawn_distance = 3000.0f;
 
@@ -14,10 +18,10 @@ public class EnemySystem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Spawn();
+        StartCoroutine(SpawnMothership());
     }
 
-    public void Spawn()
+    public void SpawnCubes()
     {
 
         for (int i = 0; i < Random.Range(10, 20); i++)
@@ -32,6 +36,14 @@ public class EnemySystem : MonoBehaviour
                         max_spawn_distance + Random.Range(0, 1000)),
                     Quaternion.identity));
             }
+        }
+    }
+
+    public IEnumerator SpawnMothership()
+    {
+        while (true) { 
+            Instantiate(mothership, new Vector3(Random.Range(10, 400), Random.Range(10, 400), max_spawn_distance), Quaternion.identity);
+            yield return new WaitForSeconds(Random.Range(1, 5));
         }
     }
 

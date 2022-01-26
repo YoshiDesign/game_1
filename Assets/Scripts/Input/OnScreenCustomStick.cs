@@ -20,7 +20,7 @@ public class OnScreenCustomStick : OnScreenControl, IPointerDownHandler, IPointe
     {
         
     }
-
+    
     public void OnPointerUp(PointerEventData data)
     {
         SendValueToControl(0.0f);

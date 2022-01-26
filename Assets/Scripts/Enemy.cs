@@ -4,12 +4,7 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-
-    [SerializeField]
-    private GameObject enemySystem;
-
     public Vector3 velocity;
-
 
     // Start is called before the first frame update
     void Start()
@@ -32,7 +27,7 @@ public class Enemy : MonoBehaviour
     {
 
         if (transform.position.z < -100.0f || transform.position.z > 5000.0f) {
-            GameObject.Destroy(this.gameObject);
+            Destroy(this.gameObject);
         }
 
     }

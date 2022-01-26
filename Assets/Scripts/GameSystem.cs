@@ -46,7 +46,7 @@ public class GameSystem : MonoBehaviour
     public void CreateTerrainRow() {
         rows.Dequeue();
         rows.Enqueue(Instantiate(_terrainRowPrefab, new Vector3(0, 0, max_distance), Quaternion.identity));
-        es.Spawn();
+        es.SpawnCubes();
         gos = GameObject.FindGameObjectsWithTag("Enemy");
         no_enemies = gos.Length;
     }

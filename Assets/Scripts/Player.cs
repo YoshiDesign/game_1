@@ -28,14 +28,22 @@ public class Player : MonoBehaviour
     public float pitch_speed = 5.0f;
     public bool lock_velocity = false;
 
-    private AudioSource _laser_sound;
+    private AudioSource shoot_laser_sound;
     private Gamepad gamepad;
 
-    private void Awake()
-    {
+    private void Awake() {
         playerInputActions = new PlayerInputActions();
+    }
+
+    private void OnEnable()
+    {
         playerInputActions.Player.Enable();
         playerInputActions.Player.Shoot.performed += shootLaser;
+    }
+
+    private void OnDisable()
+    {
+        playerInputActions.Disable();
     }
 
     /**
@@ -58,7 +66,7 @@ public class Player : MonoBehaviour
     {
         dir = new Vector2(0f, 0f);
         transform.position = new Vector3(0, 50, 0);
-        _laser_sound = transform.GetComponent<AudioSource>();
+        shoot_laser_sound = transform.GetComponent<AudioSource>();
 
         gamepad = null;
         if (Gamepad.current != null) { 
@@ -149,7 +157,7 @@ public class Player : MonoBehaviour
     public void shootLaser(InputAction.CallbackContext ctx)
     {
         Instantiate(_laserPrefab, transform.position, transform.localRotation);
-        _laser_sound.Play();
+        shoot_laser_sound.Play();
     }
 
     /**

@@ -481,8 +481,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aa2813e1a0774146b14c7e8f955b826, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  touchPosition: {x: 0, y: 0}
-  touchDelta: {x: 0, y: 0}
   stick: {fileID: 1452452589}
   toggle: {fileID: 428527902}
   _attenuation_control: 7
@@ -609,6 +607,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemy: {fileID: 883656326617510524, guid: 4092f9f329026d14d89c3a9fd5bf04d1, type: 3}
+  mothership: {fileID: 3672037895843772412, guid: de5ab313924ba974ba540c8b0718bb17, type: 3}
   max_spawn_distance: 3000
 --- !u!4 &991816405
 Transform:
@@ -1303,7 +1302,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1224983776}
-  touchHandler: {fileID: 786777565}
   gameSystem: {fileID: 659432998}
 --- !u!114 &1564093043
 MonoBehaviour:

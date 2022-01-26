@@ -7,10 +7,13 @@ public class Laser : MonoBehaviour
     public float speed = 1200.0f;
     public float max_dist = 5500.0f;
     public ParticleSystem _smoke;
+    public GameObject explosionEffect;
+    private AudioSource explode_sound;
 
     private void Start()
     {
         _smoke = transform.GetComponent<ParticleSystem>();
+        explode_sound = transform.GetComponent<AudioSource>();
 
     }
 
@@ -25,11 +28,11 @@ public class Laser : MonoBehaviour
         }
         else { ; }
     }
+
     private void FixedUpdate()
     {
         
         RaycastHit hit;
-
 
         if (Physics.Raycast(transform.position, transform.forward, out hit, 50.0f)) { 
             //Debug.Log("Hit! Distance: " + hit.distance);
@@ -37,20 +40,13 @@ public class Laser : MonoBehaviour
             //Debug.Log("Hit.Collider: " + hit.collider);
 
             if (hit.transform.tag == "Enemy") {
-                hit.transform.GetComponent<Enemy>().Destroyed();
+                Destroy(hit.transform.gameObject);
+                //hit.transform.GetComponent<Enemy>().Destroyed();
+                Instantiate(explosionEffect, hit.transform.position, hit.transform.rotation);
+                explode_sound.volume = .8f - (1.5f * (transform.position.z / max_dist));
+                explode_sound.Play();
             }
         }
     }
-
-
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    Debug.Log("Hit");
-    //    if (other.tag == "Enemy")
-    //    {
-    //        Destroy(this.gameObject);
-    //        //Destroy(other.gameObject);
-    //    }
-    //}
 
 }
