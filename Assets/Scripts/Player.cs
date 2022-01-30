@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityStandardAssets.CrossPlatformInput;
 
 public class Player : MonoBehaviour
 {
@@ -10,26 +9,34 @@ public class Player : MonoBehaviour
     private GameObject _laserPrefab;
     PlayerInputActions playerInputActions;
 
+    // Speed and direction
     public float speedX = 125.0f;
     public float speedY = 110.0f;
+    public float tilt_speed = 25.0f;
+    public float pitch_speed = 5.0f;
+
     public Vector2 tmp_dir;
     public Vector2 dir;
     public Vector3 current_velocity;
     public Vector3 current_rotation;
+    public float raycast_dist = 5500.0f;
 
-    // Maximum roll the player can achieve. Effects speed
+    public Vector3 reticle_vector_1;
+    public Vector3 reticle_vector_2;
+    public Vector3 reticle_vector_3;
+
+    // Momentum- *Z-angle (roll) alters speed
     public float max_momentum = 15.0f;
     public float max_rotation = 15.0f;
     public Vector2 momentum;
-    private int lives = 3;
 
-    float drift = 0.0f;     // Rate of roll speed increase [UNUSED]
-    public float tilt_speed = 25.0f;
-    public float pitch_speed = 5.0f;
-    public bool lock_velocity = false;
+    private int lives = 3;
+    private int current_weapon = 1;
 
     private AudioSource shoot_laser_sound;
     private Gamepad gamepad;
+
+    RaycastHit reticle;
 
     private void Awake() {
         playerInputActions = new PlayerInputActions();
@@ -83,7 +90,9 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        
+        //reticle_vector_1 = (transform.position + (Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z) * (Vector3.forward * raycast_dist)));     // - (current_velocity * 240);
+        reticle_vector_2 = (transform.position + (Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z) * (Vector3.forward * (raycast_dist / 8)))); // - (current_velocity * 27);
+        reticle_vector_3 = transform.position + ((Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z) * (Vector3.forward * (raycast_dist))));// - (current_velocity * 12);
         CalculateMovement();
 
         if (lives == 0)
@@ -123,7 +132,7 @@ public class Player : MonoBehaviour
     {
 
         // When steering
-        if (current_rotation.z > 16)
+        if (current_rotation.z > 56)
         {
             momentum.x = 360.0f - current_rotation.z;
         }
@@ -132,7 +141,7 @@ public class Player : MonoBehaviour
         }
 
         // When pitching
-        if (current_rotation.x > 16)
+        if (current_rotation.x > 56)
         {
             momentum.y = 360.0f - current_rotation.x;
         }
@@ -156,8 +165,18 @@ public class Player : MonoBehaviour
     // Bang
     public void shootLaser(InputAction.CallbackContext ctx)
     {
-        Instantiate(_laserPrefab, transform.position, transform.localRotation);
-        shoot_laser_sound.Play();
+        if (current_weapon == 1) {
+            StartCoroutine(shoot_lazer());
+        }
+    }
+
+    private IEnumerator shoot_lazer()
+    {
+        for (int x = 3; x > 0; x--) {
+            Instantiate(_laserPrefab, transform.position, transform.localRotation);
+            shoot_laser_sound.Play();
+            yield return new WaitForSeconds(0.1f);       
+        }
     }
 
     /**
@@ -172,11 +191,11 @@ public class Player : MonoBehaviour
 
         float abs_angle = Mathf.Abs(angle + ((magnitude) * tilt_speed * Time.deltaTime));
 
-        if (abs_angle >= 15f && abs_angle < 200f)
+        if (abs_angle >= 55f && abs_angle < 200f)   // 200 and 220 are arbitrarily between 55 adn 305 but far enough apart to avoid confusion when determining limits
         {
             return angle;
         }
-        else if (abs_angle <= 345f && abs_angle > 300f) {
+        else if (abs_angle <= 305f && abs_angle > 220f) {
             return angle;
         }
 

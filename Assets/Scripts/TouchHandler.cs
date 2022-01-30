@@ -37,7 +37,6 @@ public class TouchHandler : MonoBehaviour
 
         if (!Touchscreen.current.primaryTouch.press.isPressed) {
             touchDelta = new Vector2(0,0);
-            print("no touch");
             stick.SetActive(false);
             if (stick_is_active)
                 stick_is_active = false;
