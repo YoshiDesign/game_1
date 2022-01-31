@@ -48,6 +48,6 @@ public class DebugManager : MonoBehaviour
         text.text += "\n\nTouch Debug: ";
         //text.text += "\nActive: "    + _touch.touchPosition.ToString();
         //text.text += "\nDelta: "     + _touch.touchDelta.ToString();
-        text.text += "\n\nObjects: " + _sys.no_enemies;
+        //text.text += "\n\nObjects: " + _sys.no_enemies;
     }
 }

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3535608554051527671}
-  - component: {fileID: -1361463789109982299}
+  - component: {fileID: -6144519153754516032}
   m_Layer: 0
   m_Name: asteroid_3
   m_TagString: asteroid
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-1361463789109982299
+--- !u!114 &-6144519153754516032
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,10 +41,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4204903634676398413}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42ee79e39d9e6f942a3edd552945735a, type: 3}
+  m_Script: {fileID: 11500000, guid: 95951e421f6738441a69cf46d0b4efc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   velocity: {x: 0, y: 0, z: 0}
+  type: 0
 --- !u!1 &5176635380228800916
 GameObject:
   m_ObjectHideFlags: 0
@@ -104,7 +105,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a98b57744d071bc429f120c496d6df49, type: 2}
+  - {fileID: 2100000, guid: f3a80eea44fee404682a6934015b8f51, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

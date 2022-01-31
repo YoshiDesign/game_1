@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.25536406, g: 0.10968531, b: 0.21187839, a: 1}
+  m_IndirectSpecularColor: {r: 0.12576932, g: 0.08846029, b: 0.2784837, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -376,17 +376,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1de70dfe2c1f7654ca0ccd50393fc4ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numRows: 5
+  numTerrainRows: 5
   max_distance: 3900
   _terrainRowPrefab: {fileID: 5275456721205914328, guid: 428182f102825604dae23e2240ff49b0, type: 3}
   player: {fileID: 1224983776}
+  largeAsteroid: {fileID: 3401346463467374064, guid: bb0f713bb150c85488d0c4e00bbb8e3f, type: 3}
   asteroid_1: {fileID: 643921834703842763, guid: 5daf494ae41ad4349b6944248eb2fd75, type: 3}
   asteroid_2: {fileID: 1460405590545989737, guid: 932aaf1aba5bf2347abd5e235ab6937e, type: 3}
   asteroid_3: {fileID: 4204903634676398413, guid: 10000b46adee65e42b785cbd99330557, type: 3}
   asteroid_4: {fileID: 313136702158037280, guid: 01ae74c36db1e504dbc3a794e4568c02, type: 3}
   asteroid_5: {fileID: 2094574866755597652, guid: 57520f929aba01d4dad244ea78cf1ca4, type: 3}
-  asteroid_6: {fileID: 3401346463467374064, guid: bb0f713bb150c85488d0c4e00bbb8e3f, type: 3}
-  asteroid_7: {fileID: 8094056730455382551, guid: 09454dfe4a57808409f16fe2c73dfc04, type: 3}
+  asteroid_6: {fileID: 8094056730455382551, guid: 09454dfe4a57808409f16fe2c73dfc04, type: 3}
   no_enemies: 0
   debris: {fileID: 9147878604017444745, guid: 4af6974c460ecc241be0a674838845b8, type: 3}
   max_spawn_distance: 3000

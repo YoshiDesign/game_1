@@ -4,8 +4,14 @@ using System.Collections.Generic;
 
 public class GameSystem : MonoBehaviour
 {
+    // The large asteroid's type enum
+    const int LARGE_ASTEROID = 6;
+
+    // Different types of asteroids. Does not include large asteroids
+    const int ASTEROID_COUNT = 6;
+
     [SerializeField]
-    private int numRows = 5;
+    private int numTerrainRows = 5;
 
     [SerializeField]
     private float max_distance = 3900.0f;
@@ -13,11 +19,16 @@ public class GameSystem : MonoBehaviour
     [SerializeField]
     private GameObject _terrainRowPrefab;
     private Queue<GameObject> rows = new Queue<GameObject>();
+    private GameObject[] rowsAsArray;
 
     [SerializeField]
     GameObject player;
-    private Player _player;
+    //private Player _player;
+    Asteroid _asteroid;
+    LargeAsteroid _large_asteroid;
 
+    [SerializeField]
+    private GameObject largeAsteroid;
     [SerializeField]
     private GameObject asteroid_1;
     [SerializeField]
@@ -30,9 +41,11 @@ public class GameSystem : MonoBehaviour
     private GameObject asteroid_5;
     [SerializeField]
     private GameObject asteroid_6;
-    [SerializeField]
-    private GameObject asteroid_7;
+
+    // Array of asteroid prefabs
     private GameObject[] asteroids;
+    // Tracking instantiation
+    private int[] asteroid_count = new int[ASTEROID_COUNT];
 
     public int no_enemies;
     GameObject[] gos;
@@ -49,28 +62,25 @@ public class GameSystem : MonoBehaviour
     private GameObject enemySystem;
     EnemySystem es;
 
-    private Vector3 proceed_speed = new Vector3(0, 0, -350.0f);
-    private float cutoff_distance = -1050.0f;
     private bool _isGameOver;
 
     private void Start()
     {
-        _player = player.GetComponent<Player>();
+       // _player = player.GetComponent<Player>();
         es = enemySystem.transform.GetComponent<EnemySystem>();
-
+            
         asteroids = new GameObject[] {
             asteroid_1,
             asteroid_2,
             asteroid_3,
             asteroid_4,
             asteroid_5,
-            asteroid_6,
-            asteroid_7
+            asteroid_6
         };
 
         _isGameOver = false;
 
-        for (int i = 0; i < numRows; i++) {
+        for (int i = 0; i < numTerrainRows; i++) {
             rows.Enqueue(Instantiate(_terrainRowPrefab, new Vector3(0, 0, (i * 1000)), Quaternion.identity));
         }
 
@@ -88,13 +98,52 @@ public class GameSystem : MonoBehaviour
 
     public IEnumerator SpawnAsteroid()
     {
+        /**
+         * TODO - Enumerate asteroids as constants
+         */ 
+
         for ( ; ; )
         { 
-            int v = Random.Range(0, 6);
-            Instantiate(asteroids[v], new Vector3(0, 3000.0f, max_distance), Quaternion.identity);
-            yield return new WaitForSeconds(Random.Range(0, 3));
+            // RNG - asteroid type
+            int v = Random.Range(0, ASTEROID_COUNT + 1);
+
+            // Increment to 10
+
+            if (v < LARGE_ASTEROID) // Within the array of small asteroids
+            {
+                asteroid_count[v] = asteroid_count[v] < 10 ? asteroid_count[v] + 1 : asteroid_count[v];
+                GameObject clone = Instantiate(asteroids[v], new Vector3(0, 3000.0f, max_distance), Quaternion.identity);
+                _asteroid = clone.GetComponent<Asteroid>();
+                _asteroid.type = v;
+            }
+            else if (spawnLargeAsteroid())
+            {
+                GameObject clone = Instantiate(largeAsteroid, new Vector3(0, 3000.0f, max_distance), Quaternion.identity);
+                _large_asteroid = clone.GetComponent<LargeAsteroid>();
+                _large_asteroid.type = v;
+            }
+ 
+            yield return new WaitForSeconds(Random.Range(2f, 5f));
         }
 
+    }
+    /**
+     * Spawn a large asteroid when we've spawned a number of every other time
+     */
+    private bool spawnLargeAsteroid()
+    {
+
+        for (int i = 0; i < asteroid_count.Length; i++)
+        {
+            if (asteroid_count[i] < 5) { 
+                return false;
+            }
+        }
+
+        // Reset the asteroid count
+        asteroid_count = new int[ASTEROID_COUNT];
+
+        return true;
     }
 
     public IEnumerator SpawnCubes()
@@ -120,10 +169,12 @@ public class GameSystem : MonoBehaviour
     }
 
     public void CreateTerrainRow() {
+        // Remove from the queue
         rows.Dequeue();
-        rows.Enqueue(Instantiate(_terrainRowPrefab, new Vector3(0, 0, max_distance), Quaternion.identity));
-        gos = GameObject.FindGameObjectsWithTag("Enemy");
-        no_enemies = gos.Length;
+        // Turn queue into array so we can access the last in line
+        rowsAsArray = rows.ToArray();
+        // Spawn the next row beginning exactly where the previous last in line left off
+        rows.Enqueue(Instantiate(_terrainRowPrefab, new Vector3(0, 0, rowsAsArray[rowsAsArray.Length - 1].transform.position.z + 1000), Quaternion.identity));
     }
 
     public void GameOver()

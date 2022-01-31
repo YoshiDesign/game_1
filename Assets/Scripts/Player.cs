@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     public float speedY = 110.0f;
     public float tilt_speed = 25.0f;
     public float pitch_speed = 5.0f;
+    public float vertical_stall_rate = 5.0f;
+    private bool stalling = false;
 
     public Vector2 tmp_dir;
     public Vector2 dir;
@@ -114,13 +116,27 @@ public class Player : MonoBehaviour
         current_velocity.x = ((speedX / max_momentum) * momentum.x) * Time.deltaTime;
 
         // Continue moving Y based on our momentum given by angle of pitch
-        current_velocity.y = ((speedY / max_momentum) * momentum.y) * Time.deltaTime;
+        if (stalling || transform.position.y >= 1300.0f)
+        {
+            Debug.Log("Stalling");
+            stalling = true;
+            current_velocity.y = momentum.y < 0 ? momentum.y : current_velocity.y - (vertical_stall_rate * Time.deltaTime);
+        }
+        else if (!stalling)
+        {
+            Debug.Log("Not Stalling");
+            current_velocity.y = ((speedY / max_momentum) * momentum.y) * Time.deltaTime;
+        }
+        else if (transform.position.y <= 1290.0f) {
+            Debug.Log("Stalling Reset");
+            stalling = false; 
+        }
 
         transform.localEulerAngles = new Vector3(current_rotation.x, current_rotation.y, current_rotation.z);
         transform.Translate(current_velocity, Space.World);
 
     }
-    /** 
+    /** `
      * Return an additive speed coeff given the current angle of roll.
      * The steeper your angle, the faster you move.
      * The ship won't move to the left while it's tilting to the right,

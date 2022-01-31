@@ -36,10 +36,10 @@ public class MainCamera : MonoBehaviour
         transform.eulerAngles = current_rotation;
 
         // Tight Camera
-        //transform.position = (player.transform.position + Quaternion.Euler(0.0f, (player.momentum.x), 0.0f) * camera_orbit) + offset;
+        transform.position = (player.transform.position + Quaternion.Euler(0.0f, (player.momentum.x), 0.0f) * camera_orbit) + offset;
 
         // Loose Camera
-        transform.position = player.transform.position + camera_orbit + offset;
+        //transform.position = player.transform.position + camera_orbit + offset;
 
     }
 }
