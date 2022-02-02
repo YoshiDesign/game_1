@@ -203,7 +203,7 @@ MonoBehaviour:
   width: 1024
   height: 1024
   scale: 22
-  proceed_speed: {x: 0, y: 0, z: -1050}
+  proceed_speed: {x: 0, y: 0, z: -1500}
   cutoff_distance: -1050
 --- !u!1 &5557666212988701093
 GameObject:

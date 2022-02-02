@@ -4,29 +4,44 @@ using System.Collections.Generic;
 
 public class GameSystem : MonoBehaviour
 {
+    /**
+     * Constant things
+     */
+    const int SPACE = 1;
     // The large asteroid's type enum
     const int LARGE_ASTEROID = 6;
-
     // Different types of asteroids. Does not include large asteroids
     const int ASTEROID_COUNT = 6;
-
+    [SerializeField]
+    private float max_spawn_distance = 3000.0f;
+    [SerializeField]
+    private float max_distance = 3900.0f;
     [SerializeField]
     private int numTerrainRows = 5;
 
+    /**
+     * Game state things
+     */
+    private bool _isGameOver;
+    private int current_level;
     [SerializeField]
-    private float max_distance = 3900.0f;
+    private int n_player_locks;     // Number of enemies the player has a locked-on
 
+    /**
+     * Environment things
+     */
+    [SerializeField]
+    private GameObject debris;
     [SerializeField]
     private GameObject _terrainRowPrefab;
     private Queue<GameObject> rows = new Queue<GameObject>();
     private GameObject[] rowsAsArray;
 
-    [SerializeField]
-    GameObject player;
-    //private Player _player;
+    /**
+     * Asteroid things
+     */
     Asteroid _asteroid;
     LargeAsteroid _large_asteroid;
-
     [SerializeField]
     private GameObject largeAsteroid;
     [SerializeField]
@@ -41,34 +56,29 @@ public class GameSystem : MonoBehaviour
     private GameObject asteroid_5;
     [SerializeField]
     private GameObject asteroid_6;
-
     // Array of asteroid prefabs
     private GameObject[] asteroids;
     // Tracking instantiation
     private int[] asteroid_count = new int[ASTEROID_COUNT];
 
-    public int no_enemies;
-    GameObject[] gos;
-
+    /**
+     * Entity things
+     */
     [SerializeField]
-    private GameObject debris;
-
-    [SerializeField]
-    private float max_spawn_distance = 3000.0f;
-
-    private Queue<GameObject> debris_array = new Queue<GameObject>();
-
+    GameObject player;
+    private Player _player;
     [SerializeField]
     private GameObject enemySystem;
     EnemySystem es;
 
-    private bool _isGameOver;
-
     private void Start()
     {
-       // _player = player.GetComponent<Player>();
+        current_level = SPACE;
+
+        _player = player.GetComponent<Player>();
+
         es = enemySystem.transform.GetComponent<EnemySystem>();
-            
+
         asteroids = new GameObject[] {
             asteroid_1,
             asteroid_2,
@@ -84,7 +94,23 @@ public class GameSystem : MonoBehaviour
             rows.Enqueue(Instantiate(_terrainRowPrefab, new Vector3(0, 0, (i * 1000)), Quaternion.identity));
         }
 
-        StartCoroutine(SpawnCubes());
+        // Begin space debris
+        if (current_level == SPACE) { 
+            for (int i = 0; i < Random.Range(5, 10); i++)
+            {
+                for (int j = 0; j < Random.Range(5, 10); j++)
+                {
+                    Instantiate(
+                        debris,
+                        new Vector3(
+                            (float)Random.Range(-2000, 2000),
+                            (float)Random.Range(0, 2000),
+                            max_spawn_distance + Random.Range(0, 1000)),
+                        Quaternion.identity);
+                }
+            }
+        }
+
         StartCoroutine(SpawnAsteroid());
 
     }
@@ -144,28 +170,6 @@ public class GameSystem : MonoBehaviour
         asteroid_count = new int[ASTEROID_COUNT];
 
         return true;
-    }
-
-    public IEnumerator SpawnCubes()
-    {
-
-        for ( ; ; )
-        {
-            for (int i = 0; i < Random.Range(3, 3); i++)
-            {
-                for (int j = 0; j < Random.Range(2, 5); j++)
-                {
-                    debris_array.Enqueue(Instantiate(
-                        debris,
-                        new Vector3(
-                            (float) Random.Range(-2000, 2000),
-                            (float) Random.Range(0, 2000),
-                            max_spawn_distance + Random.Range(0, 1000)),
-                        Quaternion.identity));
-                }
-            }
-            yield return new WaitForSeconds(Random.Range(1, 4));
-        }
     }
 
     public void CreateTerrainRow() {

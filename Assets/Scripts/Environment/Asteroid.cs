@@ -17,9 +17,9 @@ public class Asteroid : MonoBehaviour
 
     void Start()
     {
-        rng_1 = Random.Range(0, 360);
-        rng_3 = Random.Range(0, 360);
-        rng_2 = Random.Range(0, 360);
+        rng_1 = Random.Range(0, 20);
+        rng_3 = Random.Range(0, 20);
+        rng_2 = Random.Range(0, 20);
 
         swoopStart = Random.Range(0, 3000);
         swoopMagnitude = Random.Range(10.0f, 20.0f);

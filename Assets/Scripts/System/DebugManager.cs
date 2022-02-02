@@ -21,6 +21,11 @@ public class DebugManager : MonoBehaviour
     private Player _player;
     private Text text;
 
+    [SerializeField]
+    private GameObject camera;
+    private Camera _camera;
+    private MainCamera _main;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,24 +35,25 @@ public class DebugManager : MonoBehaviour
         //_reticle = reticle.GetComponent<Reticle>();
         _player = player.GetComponent<Player>();
         _sys = gameSystem.GetComponent<GameSystem>();
+        _camera = camera.GetComponent<Camera>();
+        _main = camera.GetComponent<MainCamera>();
     }
 
     // Update is called once per frame
     void Update()
     {
         Vector3 c_velocity = _player.current_velocity;
-        Vector3 c_rotation = _player.transform.eulerAngles;
+        Vector3 c_rotation = _player.current_rotation;
 
         text.text = "Direction: "    + _player.dir.ToString();
         text.text += "\nMomentum:"     + _player.momentum.ToString();
-        //text.text += "\nReticle Vector (1):"      + _player.reticle_vector_1.ToString();
-        //text.text += "\nReticle Vector (2):"      + _player.reticle_vector_2.ToString();
+        text.text += "\nThrottle: (" + _player.rampX + ", " + _player.rampY + ")";
         text.text += "\nVelocity: "  + c_velocity.ToString();
         text.text += "\nRotation: "  + c_rotation.ToString();
         text.text += "\nPos: "       + _player.transform.position.ToString();
         text.text += "\n\nTouch Debug: ";
-        //text.text += "\nActive: "    + _touch.touchPosition.ToString();
-        //text.text += "\nDelta: "     + _touch.touchDelta.ToString();
-        //text.text += "\n\nObjects: " + _sys.no_enemies;
+        text.text += "\n\nCamera:";
+        text.text += "\nPosition:" + _camera.transform.position.ToString();
+        
     }
 }

@@ -5,27 +5,56 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
+    const int UNASSIGNED = 0;
+    const int LASER = 1;
+    const int HOMING = 2;
+
+    private int basic_weapon;
+    private int special_weapon;
+
     [SerializeField]
     private GameObject _laserPrefab;
     PlayerInputActions playerInputActions;
 
-    // Speed and direction
-    public float speedX = 125.0f;
-    public float speedY = 110.0f;
-    public float tilt_speed = 25.0f;
-    public float pitch_speed = 5.0f;
-    public float vertical_stall_rate = 5.0f;
-    private bool stalling = false;
+    private float upperBound = 1000.0f;
+    private float lowerBound = 0.0f;
+    private float rightBound = 2000.0f;
+    private float leftBound = -2000.0f;
 
-    public Vector2 tmp_dir;
+    // Speed and direction
+    public float speedX = 500.0f;
+    public float speedY = 500.0f;
+    public float tilt_speed = 25.0f;
+    
+    // If we hit a boundary, the momentum will be set to 0.
+    // It then needs to gradually reset to what it was prior to hitting the boundary
+    public float rampX = 1.0f;
+    public float rampY = 1.0f;
+    public float rampX_rate = 1f;
+    public float rampY_rate = 1f;
+
+    // Actual current direction independent of controller press.
+    private int _dirX = 0;
+    private int _dirY = 0;
+
+    // Magnitude of deceleration when the player cannot control the craft
+    // due to being out of bounds
+    [SerializeField]
+    private float stall = 80f;
+
     public Vector2 dir;
     public Vector3 current_velocity;
     public Vector3 current_rotation;
+
     public float raycast_dist = 5500.0f;
+    private float max_X_momentum = 55.0f;
+    private float max_Y_momentum = 55.0f;
 
     public Vector3 reticle_vector_1;
     public Vector3 reticle_vector_2;
     public Vector3 reticle_vector_3;
+
+    private float _canShoot = 0.0f;
 
     // Momentum- *Z-angle (roll) alters speed
     public float max_momentum = 15.0f;
@@ -38,7 +67,7 @@ public class Player : MonoBehaviour
     private AudioSource shoot_laser_sound;
     private Gamepad gamepad;
 
-    RaycastHit reticle;
+    // RaycastHit reticle;
 
     private void Awake() {
         playerInputActions = new PlayerInputActions();
@@ -55,39 +84,26 @@ public class Player : MonoBehaviour
         playerInputActions.Disable();
     }
 
-    /**
-     * 
-     * 
-     * 
-     * 
-     * 
-     * TODO
-     * 
-     * Check for gamepad
-     * If gamepad, attenuate rotation?
-     * 
-     * 
-     * 
-     * 
-     */
-
     void Start()
     {
         dir = new Vector2(0f, 0f);
+        basic_weapon = LASER;
+        special_weapon = HOMING;
+
         transform.position = new Vector3(0, 50, 0);
         shoot_laser_sound = transform.GetComponent<AudioSource>();
 
         gamepad = null;
         if (Gamepad.current != null) { 
+
             gamepad = Gamepad.current;
             Debug.Log("Gamepad Detected");
-        
         }
     }
 
     private void Update()
     {
-        dir = playerInputActions.Player.Movement.ReadValue<Vector2>();
+        dir = playerInputActions.Player.Movement.ReadValue<Vector2>();        
     }
 
     void FixedUpdate()
@@ -107,36 +123,62 @@ public class Player : MonoBehaviour
 
     public void CalculateMovement()
     {
-        
+
         // Velocity augmentation based on pitch and roll
-        getMomentum();
         CalculateRotation(dir.x, dir.y);
+        getMomentum();
+        checkBounds();
 
-        // Continue moving X based on our momentum given by angle of rotation
-        current_velocity.x = ((speedX / max_momentum) * momentum.x) * Time.deltaTime;
-
-        // Continue moving Y based on our momentum given by angle of pitch
-        if (stalling || transform.position.y >= 1300.0f)
-        {
-            Debug.Log("Stalling");
-            stalling = true;
-            current_velocity.y = momentum.y < 0 ? momentum.y : current_velocity.y - (vertical_stall_rate * Time.deltaTime);
-        }
-        else if (!stalling)
-        {
-            Debug.Log("Not Stalling");
-            current_velocity.y = ((speedY / max_momentum) * momentum.y) * Time.deltaTime;
-        }
-        else if (transform.position.y <= 1290.0f) {
-            Debug.Log("Stalling Reset");
-            stalling = false; 
-        }
-
+        current_velocity.y = (((momentum.y) / max_Y_momentum) * speedY) * Time.deltaTime;
+        current_velocity.x = (((momentum.x) / max_X_momentum) * speedX) * Time.deltaTime;
+   
         transform.localEulerAngles = new Vector3(current_rotation.x, current_rotation.y, current_rotation.z);
         transform.Translate(current_velocity, Space.World);
 
     }
-    /** `
+
+    void checkBounds()
+    {
+
+        // Right Boundary
+        if (
+            (rightBound - transform.position.x <= momentum.x && current_rotation.z > 300) ||
+            (transform.position.x > rightBound && dir.x > 0)
+        )
+        {
+            momentum.x = rightBound - transform.position.x;
+        }
+
+        // Left Boundary
+        if (
+            (leftBound - transform.position.x >= momentum.x && current_rotation.z < 100) ||
+            (transform.position.x < leftBound && dir.x < 0)
+        )
+        {
+            momentum.x = leftBound - transform.position.x;
+        }
+
+        // Top Boundary
+        if (
+            (upperBound - transform.position.y <= momentum.y && current_rotation.x > 300) ||
+            (transform.position.y > upperBound && dir.y > 0)
+        )
+        {
+            momentum.y = upperBound - transform.position.y;
+        }
+
+        // Bottom Boundary
+        if (
+            (lowerBound - transform.position.y >= momentum.y && current_rotation.x < 100) ||
+            (transform.position.y < lowerBound && dir.y < 0)
+        )
+        {
+            momentum.y = lowerBound - transform.position.y;
+        }
+
+
+    }
+    /** 
      * Return an additive speed coeff given the current angle of roll.
      * The steeper your angle, the faster you move.
      * The ship won't move to the left while it's tilting to the right,
@@ -181,12 +223,17 @@ public class Player : MonoBehaviour
     // Bang
     public void shootLaser(InputAction.CallbackContext ctx)
     {
-        if (current_weapon == 1) {
-            StartCoroutine(shoot_lazer());
+        if (_canShoot < Time.time) { 
+        
+            if (current_weapon == 1) {
+                StartCoroutine(shoot_laser());
+                _canShoot = Time.time + 0.5f;
+            }
+
         }
     }
 
-    private IEnumerator shoot_lazer()
+    private IEnumerator shoot_laser()
     {
         for (int x = 3; x > 0; x--) {
             Instantiate(_laserPrefab, transform.position, transform.localRotation);

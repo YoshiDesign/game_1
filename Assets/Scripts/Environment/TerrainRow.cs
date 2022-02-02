@@ -9,7 +9,7 @@ public class TerrainRow : MonoBehaviour
     public int height = 1024;
     public float scale = 22.0f;
 
-    public Vector3 proceed_speed = new Vector3(0, 0, -1050.0f);
+    public Vector3 proceed_speed = new Vector3(0, 0, -1500.0f);
     public float cutoff_distance = -1050.0f;
     // Start is called before the first frame update
     void Start()

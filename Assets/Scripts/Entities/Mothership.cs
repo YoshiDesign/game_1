@@ -86,7 +86,7 @@ public class Mothership : MonoBehaviour
         GameObject clone = Instantiate(laser, transform.position + (transform.forward * 50), transform.rotation);
         // Laser _laser = clone.transform.GetComponent<Laser>();
 
-        shoot_sound.volume = .8f - (1.5f * (transform.position.z / max_dist));
+        shoot_sound.volume = .5f - (1.5f * (transform.position.z / max_dist));
         shoot_sound.Play();
     }
 }

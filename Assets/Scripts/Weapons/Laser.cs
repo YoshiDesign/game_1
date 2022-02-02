@@ -44,7 +44,7 @@ public class Laser : MonoBehaviour
                 Destroy(hit.transform.gameObject);
                 //hit.transform.GetComponent<Enemy>().Destroyed();
                 GameObject expl_clone = Instantiate(explosionEffect, hit.transform.position, hit.transform.rotation);
-                explode_sound.volume = .6f - (1.5f * (transform.position.z / max_dist));
+                explode_sound.volume = .3f - (1.5f * (transform.position.z / max_dist));
                 explode_sound.Play();
                 Destroy(expl_clone, 1.0f);
             }
