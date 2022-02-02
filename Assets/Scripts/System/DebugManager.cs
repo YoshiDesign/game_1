@@ -47,7 +47,6 @@ public class DebugManager : MonoBehaviour
 
         text.text = "Direction: "    + _player.dir.ToString();
         text.text += "\nMomentum:"     + _player.momentum.ToString();
-        text.text += "\nThrottle: (" + _player.rampX + ", " + _player.rampY + ")";
         text.text += "\nVelocity: "  + c_velocity.ToString();
         text.text += "\nRotation: "  + c_rotation.ToString();
         text.text += "\nPos: "       + _player.transform.position.ToString();

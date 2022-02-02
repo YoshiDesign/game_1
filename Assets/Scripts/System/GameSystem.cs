@@ -90,6 +90,7 @@ public class GameSystem : MonoBehaviour
 
         _isGameOver = false;
 
+        // Begin terrain rows
         for (int i = 0; i < numTerrainRows; i++) {
             rows.Enqueue(Instantiate(_terrainRowPrefab, new Vector3(0, 0, (i * 1000)), Quaternion.identity));
         }

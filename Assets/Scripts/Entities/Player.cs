@@ -9,65 +9,56 @@ public class Player : MonoBehaviour
     const int LASER = 1;
     const int HOMING = 2;
 
-    private int basic_weapon;
-    private int special_weapon;
-
     [SerializeField]
     private GameObject _laserPrefab;
+    [SerializeField]
+    private GameObject _homingPrefab;
     PlayerInputActions playerInputActions;
 
+    /**
+     * Boundaries
+     */
     private float upperBound = 1000.0f;
     private float lowerBound = 0.0f;
     private float rightBound = 2000.0f;
     private float leftBound = -2000.0f;
 
-    // Speed and direction
+    /**
+     * Velocity
+     */
     public float speedX = 500.0f;
     public float speedY = 500.0f;
     public float tilt_speed = 25.0f;
-    
-    // If we hit a boundary, the momentum will be set to 0.
-    // It then needs to gradually reset to what it was prior to hitting the boundary
-    public float rampX = 1.0f;
-    public float rampY = 1.0f;
-    public float rampX_rate = 1f;
-    public float rampY_rate = 1f;
-
-    // Actual current direction independent of controller press.
-    private int _dirX = 0;
-    private int _dirY = 0;
-
-    // Magnitude of deceleration when the player cannot control the craft
-    // due to being out of bounds
-    [SerializeField]
-    private float stall = 80f;
-
     public Vector2 dir;
     public Vector3 current_velocity;
     public Vector3 current_rotation;
-
-    public float raycast_dist = 5500.0f;
+    public Vector2 momentum;
+    public float max_momentum = 15.0f;
+    public float max_rotation = 15.0f;
     private float max_X_momentum = 55.0f;
     private float max_Y_momentum = 55.0f;
 
+    /**
+     * Reticle
+     */
+    public float raycast_dist = 5500.0f;
     public Vector3 reticle_vector_1;
     public Vector3 reticle_vector_2;
     public Vector3 reticle_vector_3;
 
-    private float _canShoot = 0.0f;
-
-    // Momentum- *Z-angle (roll) alters speed
-    public float max_momentum = 15.0f;
-    public float max_rotation = 15.0f;
-    public Vector2 momentum;
-
+    /**
+     * Player state
+     */
+    private float _laserCD = 0.0f;
+    private float _homingCD = 0.0f;
     private int lives = 3;
-    private int current_weapon = 1;
+    private int basic_weapon;
+    private int special_weapon;
+    public int missle_count = 2;
 
+    // Other
     private AudioSource shoot_laser_sound;
     private Gamepad gamepad;
-
-    // RaycastHit reticle;
 
     private void Awake() {
         playerInputActions = new PlayerInputActions();
@@ -76,7 +67,8 @@ public class Player : MonoBehaviour
     private void OnEnable()
     {
         playerInputActions.Player.Enable();
-        playerInputActions.Player.Shoot.performed += shootLaser;
+        playerInputActions.Player.Shoot.performed += shootBasic;
+        playerInputActions.Player.ShootSpecial.performed += shootSpecial;
     }
 
     private void OnDisable()
@@ -87,17 +79,17 @@ public class Player : MonoBehaviour
     void Start()
     {
         dir = new Vector2(0f, 0f);
-        basic_weapon = LASER;
+
+        basic_weapon   = LASER;
         special_weapon = HOMING;
 
         transform.position = new Vector3(0, 50, 0);
         shoot_laser_sound = transform.GetComponent<AudioSource>();
 
         gamepad = null;
-        if (Gamepad.current != null) { 
-
-            gamepad = Gamepad.current;
+        if (Gamepad.current != null) {
             Debug.Log("Gamepad Detected");
+            gamepad = Gamepad.current;
         }
     }
 
@@ -221,15 +213,21 @@ public class Player : MonoBehaviour
     }
 
     // Bang
-    public void shootLaser(InputAction.CallbackContext ctx)
+    public void shootBasic(InputAction.CallbackContext ctx)
     {
-        if (_canShoot < Time.time) { 
-        
-            if (current_weapon == 1) {
-                StartCoroutine(shoot_laser());
-                _canShoot = Time.time + 0.5f;
+        if (basic_weapon == LASER && _laserCD < Time.time) {
+            StartCoroutine(shoot_laser());
+            _laserCD = Time.time + 0.5f;
+        }
+    }
+    public void shootSpecial(InputAction.CallbackContext ctx)
+    {
+        if (special_weapon == HOMING && _homingCD < Time.time) {
+            for (int i = 0; i < missle_count; i++) {
+                GameObject clone = Instantiate(_homingPrefab, transform.position, Quaternion.identity);
+                HomingMissle hm = clone.GetComponent<HomingMissle>();
+                hm.num = i;
             }
-
         }
     }
 

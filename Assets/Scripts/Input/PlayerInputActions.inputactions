@@ -22,6 +22,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "ShootSpecial",
+                    "type": "Button",
+                    "id": "1f57d6ff-1103-4412-80ae-bf75c2f6280b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -43,17 +52,6 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad;Touch_Screen",
-                    "action": "Shoot",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "7d0d51bf-82ff-49fe-9d0e-b6c7623adc24",
-                    "path": "<Gamepad>/leftTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Touch_Screen",
                     "action": "Shoot",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -118,9 +116,31 @@
                     "id": "78e75fd8-1edf-4564-99dd-f69f86fe7de1",
                     "path": "<Gamepad>/leftStick",
                     "interactions": "",
-                    "processors": "StickDeadzone(min=0.08,max=0.95)",
+                    "processors": "StickDeadzone(min=0.03,max=0.95)",
                     "groups": "Gamepad",
                     "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "708b7587-d366-4256-bb4a-8b231680151f",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "ShootSpecial",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8bffe19f-bd4b-401d-9789-f1a2e55b9ebc",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "ShootSpecial",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

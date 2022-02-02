@@ -1031,24 +1031,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _laserPrefab: {fileID: 653527068893739552, guid: 880677a33e0b28c4488518de65279944, type: 3}
+  _homingPrefab: {fileID: 2033187910173969611, guid: 3f21df92881805445ae42c7d3e8d2c8a, type: 3}
   speedX: 500
   speedY: 500
   tilt_speed: 25
-  rampX: 1
-  rampY: 1
-  rampX_rate: 1
-  rampY_rate: 1
-  stall: 80
   dir: {x: 0, y: 0}
   current_velocity: {x: 0, y: 0, z: 0}
   current_rotation: {x: 0, y: 0, z: 0}
+  momentum: {x: 0, y: 0}
+  max_momentum: 15
+  max_rotation: 15
   raycast_dist: 5500
   reticle_vector_1: {x: 0, y: 0, z: 0}
   reticle_vector_2: {x: 0, y: 0, z: 0}
   reticle_vector_3: {x: 0, y: 0, z: 0}
-  max_momentum: 15
-  max_rotation: 15
-  momentum: {x: 0, y: 0}
+  missle_count: 2
 --- !u!82 &1224983778
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1315,6 +1312,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 8d250448-4810-406f-80d0-7df8dc266c85
     m_ActionName: UI/TrackedDeviceOrientation
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 1f57d6ff-1103-4412-80ae-bf75c2f6280b
+    m_ActionName: Player/ShootSpecial[/Keyboard/shift,/XInputControllerWindows/leftTrigger]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
