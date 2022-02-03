@@ -26,6 +26,7 @@ public class GameSystem : MonoBehaviour
     private int current_level;
     [SerializeField]
     private int n_player_locks;     // Number of enemies the player has a locked-on
+    Vector3 rng_vec = new Vector3(0, 0, 0);
 
     /**
      * Environment things
@@ -70,6 +71,8 @@ public class GameSystem : MonoBehaviour
     [SerializeField]
     private GameObject enemySystem;
     EnemySystem es;
+    [SerializeField]
+    private GameObject homingMisslePowerup_prefab;
 
     private void Start()
     {
@@ -96,7 +99,7 @@ public class GameSystem : MonoBehaviour
         }
 
         // Begin space debris
-        if (current_level == SPACE) { 
+        if (current_level == SPACE) {
             for (int i = 0; i < Random.Range(5, 10); i++)
             {
                 for (int j = 0; j < Random.Range(5, 10); j++)
@@ -113,6 +116,7 @@ public class GameSystem : MonoBehaviour
         }
 
         StartCoroutine(SpawnAsteroid());
+        StartCoroutine(SpawnPowerup());
 
     }
 
@@ -123,6 +127,16 @@ public class GameSystem : MonoBehaviour
         }
     }
 
+    public IEnumerator SpawnPowerup()
+    {
+        for ( ; ; ) {
+            yield return new WaitForSeconds(5);
+            rng_vec.x = Random.Range(-1800, 1800);
+            rng_vec.y = Random.Range(20, 1000);
+            rng_vec.z = max_distance;
+            Instantiate(homingMisslePowerup_prefab, rng_vec, Quaternion.identity);
+        }
+    } 
     public IEnumerator SpawnAsteroid()
     {
         /**

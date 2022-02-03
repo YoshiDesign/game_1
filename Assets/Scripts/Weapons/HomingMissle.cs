@@ -14,7 +14,7 @@ public class HomingMissle : MonoBehaviour
     // Of all missles launched, which one is this one
     public int num = 0;
 
-    public Transform target;
+    public GameObject target;
 
     // Start is called before the first frame update
     void Start()
@@ -35,5 +35,9 @@ public class HomingMissle : MonoBehaviour
     {
         yield return new WaitForSeconds(2);
 
+    }
+
+    public void trackTarget()
+    { 
     }
 }

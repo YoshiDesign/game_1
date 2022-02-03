@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Custom;
+public class Mothership : Enemy { 
 
-public class Mothership : MonoBehaviour
-{
     [SerializeField]
     private GameObject laser;
     private Transform player;
@@ -19,7 +19,7 @@ public class Mothership : MonoBehaviour
     private Vector3 velocity;
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
 
         player = GameObject.Find("Player").transform;
@@ -40,13 +40,14 @@ public class Mothership : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
         // Check if we should destroy this game object
         if (transform.position.z < -100.0f || transform.position.z > 5000.0f)
         {
             Destroy(this.gameObject);
         }
+
     }
 
     private void FixedUpdate()

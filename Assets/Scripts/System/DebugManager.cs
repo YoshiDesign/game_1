@@ -46,13 +46,16 @@ public class DebugManager : MonoBehaviour
         Vector3 c_rotation = _player.current_rotation;
 
         text.text = "Direction: "    + _player.dir.ToString();
-        text.text += "\nMomentum:"     + _player.momentum.ToString();
-        text.text += "\nVelocity: "  + c_velocity.ToString();
-        text.text += "\nRotation: "  + c_rotation.ToString();
         text.text += "\nPos: "       + _player.transform.position.ToString();
+        text.text += "\nRotation: "  + c_rotation.ToString();
+        text.text += "\nVelocity: "  + c_velocity.ToString();
+        text.text += "\nMomentum:"     + _player.momentum.ToString();
+        text.text += "\nSpecial:"     + _player.special_weapon;
+
         text.text += "\n\nTouch Debug: ";
         text.text += "\n\nCamera:";
         text.text += "\nPosition:" + _camera.transform.position.ToString();
+        text.text += "\nRotation:" + _camera.transform.rotation.ToString();
         
     }
 }

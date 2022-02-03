@@ -8,6 +8,7 @@ TagManager:
   - Laser
   - OptionsMenu
   - asteroid
+  - homing_missle_powerup
   layers:
   - Default
   - TransparentFX

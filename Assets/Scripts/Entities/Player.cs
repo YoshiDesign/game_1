@@ -5,15 +5,38 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    const int UNASSIGNED = 0;
-    const int LASER = 1;
-    const int HOMING = 2;
 
+    // Weapon constants
+    public const int UNASSIGNED = 100;
+    public const int LASER = 101;
+    public const int HOMING = 102;
+
+    /**
+     * Composition stuff
+     */
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
     private GameObject _homingPrefab;
+    [SerializeField]
+    private GameObject _reticle;
+    Reticle reticle;
     PlayerInputActions playerInputActions;
+
+    /**
+     * Player state
+     */
+    private Stack<GameObject> locked_targets;
+    public int missle_count = 2;            // Missle count determines max locked_targets
+    private int lives = 3;
+    private int basic_weapon;
+    public int special_weapon;
+
+    // Cooldowns
+    private float _laserCD  = 0.0f;
+    private float _homingCD = 0.0f;
+    public float _laserCD_time  = 0.5f;
+    public float _homingCD_time = 3f;
 
     /**
      * Boundaries
@@ -21,7 +44,7 @@ public class Player : MonoBehaviour
     private float upperBound = 1000.0f;
     private float lowerBound = 0.0f;
     private float rightBound = 2000.0f;
-    private float leftBound = -2000.0f;
+    private float leftBound  = -2000.0f;
 
     /**
      * Velocity
@@ -42,19 +65,9 @@ public class Player : MonoBehaviour
      * Reticle
      */
     public float raycast_dist = 5500.0f;
-    public Vector3 reticle_vector_1;
+    // public Vector3 reticle_vector_1;
     public Vector3 reticle_vector_2;
     public Vector3 reticle_vector_3;
-
-    /**
-     * Player state
-     */
-    private float _laserCD = 0.0f;
-    private float _homingCD = 0.0f;
-    private int lives = 3;
-    private int basic_weapon;
-    private int special_weapon;
-    public int missle_count = 2;
 
     // Other
     private AudioSource shoot_laser_sound;
@@ -79,12 +92,13 @@ public class Player : MonoBehaviour
     void Start()
     {
         dir = new Vector2(0f, 0f);
-
+        
         basic_weapon   = LASER;
-        special_weapon = HOMING;
+        special_weapon = UNASSIGNED;
 
         transform.position = new Vector3(0, 50, 0);
         shoot_laser_sound = transform.GetComponent<AudioSource>();
+        reticle = _reticle.GetComponent<Reticle>();
 
         gamepad = null;
         if (Gamepad.current != null) {
@@ -112,6 +126,7 @@ public class Player : MonoBehaviour
         }
 
     }
+
 
     public void CalculateMovement()
     {
@@ -212,34 +227,6 @@ public class Player : MonoBehaviour
             current_rotation.x = rotate_player(transform.localEulerAngles.x, -_y, "X");
     }
 
-    // Bang
-    public void shootBasic(InputAction.CallbackContext ctx)
-    {
-        if (basic_weapon == LASER && _laserCD < Time.time) {
-            StartCoroutine(shoot_laser());
-            _laserCD = Time.time + 0.5f;
-        }
-    }
-    public void shootSpecial(InputAction.CallbackContext ctx)
-    {
-        if (special_weapon == HOMING && _homingCD < Time.time) {
-            for (int i = 0; i < missle_count; i++) {
-                GameObject clone = Instantiate(_homingPrefab, transform.position, Quaternion.identity);
-                HomingMissle hm = clone.GetComponent<HomingMissle>();
-                hm.num = i;
-            }
-        }
-    }
-
-    private IEnumerator shoot_laser()
-    {
-        for (int x = 3; x > 0; x--) {
-            Instantiate(_laserPrefab, transform.position, transform.localRotation);
-            shoot_laser_sound.Play();
-            yield return new WaitForSeconds(0.1f);       
-        }
-    }
-
     /**
      * @function rotate_player
      * @param float angle
@@ -252,16 +239,62 @@ public class Player : MonoBehaviour
 
         float abs_angle = Mathf.Abs(angle + ((magnitude) * tilt_speed * Time.deltaTime));
 
-        if (abs_angle >= 55f && abs_angle < 200f)   // 200 and 220 are arbitrarily between 55 adn 305 but far enough apart to avoid confusion when determining limits
+        if (abs_angle >= 55f && abs_angle < 200f)   // 200 and 220 are arbitrarily between 55 and 305 but far enough apart to avoid confusion when determining limits
         {
             return angle;
         }
-        else if (abs_angle <= 305f && abs_angle > 220f) {
+        else if (abs_angle <= 305f && abs_angle > 220f)
+        {
             return angle;
         }
 
         return angle + ((magnitude) * tilt_speed * Time.deltaTime);
 
     }
+
+    /**
+     * Shoot Weapons
+     */
+    public void shootBasic(InputAction.CallbackContext ctx)
+    {
+        if (basic_weapon == LASER && _laserCD < Time.time) {
+            StartCoroutine(shoot_triple_laser());
+            _laserCD = Time.time + _laserCD_time;
+        }
+    }
+    public void shootSpecial(InputAction.CallbackContext ctx)
+    {
+        if (special_weapon == UNASSIGNED) return;
+
+        if (special_weapon == HOMING && _homingCD < Time.time) {
+            for (int i = 0; i < missle_count; i++) {
+                GameObject clone = Instantiate(_homingPrefab, transform.position, Quaternion.identity);
+                HomingMissle hm = clone.GetComponent<HomingMissle>();
+                hm.num = i;
+                hm.target = locked_targets.Pop();
+            }
+            _homingCD = Time.time + _homingCD_time;
+        }
+
+    }
+    private IEnumerator shoot_triple_laser()
+    {
+        for (int x = 3; x > 0; x--) {
+            Instantiate(_laserPrefab, transform.position, transform.localRotation);
+            shoot_laser_sound.Play();
+            yield return new WaitForSeconds(0.1f);       
+        }
+    }
+
+    /**
+     * Enable Special weapons
+     */
+    public void enableHomingMissle()
+    {
+        print("enableHomingMissle");
+        special_weapon = HOMING;
+        reticle.EnableHomingReticle();
+    }
+
 
 }
