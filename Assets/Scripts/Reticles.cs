@@ -13,18 +13,33 @@ public class Reticles : MonoBehaviour
     RaycastHit hit;
     Ray ray;
     Vector3 homing_reticle_ray;
+    Vector3 trackPoint;
 
-    Dictionary<int, GameObject> activeLockReticles;
+    // Lock-on reticles are children of the reticle game object. (They could also be prefabs but I think this is more performant)
+    private const int lock_reticle_child_index_start = 4;
+    private const int lock_reticle_child_index_end = 11;
+
+    // LockReticle Transform
+    Queue<Transform> allLockReticles_0;
+    Queue<Transform> allLockReticles_1;
+    Queue<Transform> allLockReticles_2;
+    // Active lockReticle queue
+    Queue<Transform> activeLockReticleQueue;
+
+    // Next reticle to be initialized
+    LockReticle nextReticle;
+    // Modulus controls which old lock is replaced by a new one. It should always be the least recent one
+    public int current_queue = 0;
 
     //private Vector3 reticle_vector_1_pos;
     private Vector3 reticle_vector_2_pos;
     private Vector3 reticle_vector_3_pos;
     private Player player;
     bool tracked = false;
-    bool bypass_lock = false;
-    public Queue<Transform> locked_targets;
-    public List<int> locked_ids;
-    public int max_targets = 2;            // Missle count determines max locked_targets
+
+    public Queue<Transform> locked_targets; // This queue is tracking all currently locked on enemies but is currently unused.
+    public List<int> locked_ids;            // Enemy object IDs that the player is currently locked onto
+    public int max_targets = 2;
 
     //private Transform laser_reticle_1;
     private Transform laser_reticle_2;
@@ -32,13 +47,26 @@ public class Reticles : MonoBehaviour
     private Transform homing_reticle_default;
     private Transform homing_reticle_locked;
 
-
     // Start is called before the first frame update
     void Start()
     {
         locked_targets = new Queue<Transform>();
         locked_ids = new List<int>();
-        activeLockReticles = new Dictionary<int, GameObject>(); // Instance ID: Reticle
+
+        allLockReticles_0 = new Queue<Transform>();
+        allLockReticles_1 = new Queue<Transform>();
+        allLockReticles_2 = new Queue<Transform>();
+
+        for (int i = 0; i < lock_reticle_child_index_end - lock_reticle_child_index_start + 1; i++)
+        {
+            Transform ret = transform.GetChild(i + lock_reticle_child_index_start);
+            if (allLockReticles_0.Count < 2)
+                allLockReticles_0.Enqueue(ret);
+            if (allLockReticles_1.Count < 4)
+                allLockReticles_1.Enqueue(ret);
+            if (allLockReticles_2.Count < 8)
+                allLockReticles_2.Enqueue(ret);
+        }
 
         cam = _cam.GetComponent<Camera>();
         player = GameObject.Find("Player").GetComponent<Player>();
@@ -47,6 +75,9 @@ public class Reticles : MonoBehaviour
         laser_reticle_2 = transform.GetChild(1);
         laser_reticle_3 = transform.GetChild(2);
         homing_reticle_default = transform.GetChild(3);
+
+        // Start with base upgrade reticle group
+        upgradeHomingMissle(0);
     }
 
     // Update is called once per frame
@@ -63,6 +94,19 @@ public class Reticles : MonoBehaviour
         //laser_reticle_1.position = reticle_vector_1_pos;
         laser_reticle_2.position = reticle_vector_2_pos;
         laser_reticle_3.position = reticle_vector_3_pos;
+    }
+    private void upgradeHomingMissle(int n) {
+        switch (n) {
+            case 0:
+                activeLockReticleQueue = allLockReticles_0;
+                break;
+            case 1:
+                activeLockReticleQueue = allLockReticles_1;
+                break;
+            case 2:
+                activeLockReticleQueue = allLockReticles_2;
+                break;
+        }
     }
 
     private void FixedUpdate()
@@ -99,9 +143,8 @@ public class Reticles : MonoBehaviour
                 // Check if we're already tracking this target
                 for (int i = 0; i < locked_ids.Count; i++)
                 {
-                    if (hit.transform.GetInstanceID() == locked_ids[i])
+                    if (hit.transform.GetInstanceID() == locked_ids[i]) // This transform is already in our locked_targets queue
                     {
-                        Debug.Log("RETURN. 1");
                         tracked = true;
                         return; // target is already being tracked
                     }
@@ -110,11 +153,10 @@ public class Reticles : MonoBehaviour
                 //  If we already have max_targets locked
                 if (locked_targets.Count == max_targets && !tracked)
                 {
-                    Debug.Log("DESTROY");
-                    // Remove the first queued
-                    Destroy(activeLockReticles[locked_ids[0]]);
-                    activeLockReticles.Remove(locked_ids[0]);
-                    locked_targets.Dequeue();
+                    // This emulates Dequeue -> Enqueue with less overhead
+                    Transform replace_lock_reticle = activeLockReticleQueue.Peek();
+                    replace_lock_reticle.gameObject.SetActive(false);
+                    locked_targets.Dequeue(); // This queue is tracking all currently locked on enemies but is currently unused.
                     locked_ids.RemoveAt(0);
                 }
                 CreateLock(hit.transform);
@@ -122,43 +164,29 @@ public class Reticles : MonoBehaviour
         }
     }
 
-    //private void ShuffleIds()
-    //{
-    //    // Queue.Dequeue but returns the rest
-    //    locked_ids = new ArraySegment<int>(locked_ids, 1, locked_ids.Length - 1).Array;
-    //}
-
     private void CreateLock(Transform target)
     {
-        Vector3 trackPoint = cam.WorldToScreenPoint(target.transform.position);
+        trackPoint = cam.WorldToScreenPoint(target.transform.position);
         trackPoint.z = 0;
-        Debug.Log("Create...");
-        LockReticle clone = Instantiate(
-            lockedReticlePrefab,
-            trackPoint,
-            Quaternion.identity
-        ).GetComponent<LockReticle>();
 
-        clone.GetComponent<LockReticle>();
+        nextReticle = activeLockReticleQueue.Dequeue().GetComponent<LockReticle>();
+        nextReticle.gameObject.SetActive(true);
+        nextReticle.target = target;
+        activeLockReticleQueue.Enqueue(nextReticle.transform);
 
-        //LockReticle _lock_reticle = clone.GetComponent<LockReticle>();
-        clone.gameObject.transform.parent = transform;
-        clone.target = target;
+        addLockedOnTarget(target.transform);
 
-        addLockedOnTarget(target.transform, clone);
     }
 
-    public void addLockedOnTarget(Transform target, LockReticle lock_reticle)
+    public void addLockedOnTarget(Transform target)
     {
         int iid = target.transform.GetInstanceID();
         locked_ids.Add(iid);
         locked_targets.Enqueue(target);
-        activeLockReticles.Add(iid, lock_reticle.gameObject);
     }
 
-    public void setMaxTargets(int n) {max_targets = n;}
-    public int getMaxTargets(){return max_targets;}
-
+    public void setMaxTargets(int n) { max_targets = n; }
+    public int getMaxTargets() { return max_targets; }
     public void TrackTarget()
     {
         

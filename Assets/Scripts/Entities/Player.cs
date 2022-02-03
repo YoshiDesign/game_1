@@ -290,7 +290,6 @@ public class Player : MonoBehaviour
      */
     public void enableHomingMissle()
     {
-        print("enableHomingMissle");
         special_weapon = HOMING;
         reticle.EnableHomingReticle();
     }
