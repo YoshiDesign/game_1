@@ -10,7 +10,7 @@ public class DebugManager : MonoBehaviour
 
     [SerializeField]
     private GameObject reticle;
-    private Reticle _reticle;
+    private Reticles _reticle;
     //[SerializeField]
     //private GameObject touchHandler ;
     [SerializeField]
@@ -32,7 +32,7 @@ public class DebugManager : MonoBehaviour
         //_touch = touchHandler.GetComponent<TouchHandler>();
 
         text = transform.GetComponent<Text>();
-        //_reticle = reticle.GetComponent<Reticle>();
+        _reticle = reticle.GetComponent<Reticles>();
         _player = player.GetComponent<Player>();
         _sys = gameSystem.GetComponent<GameSystem>();
         _camera = camera.GetComponent<Camera>();
@@ -56,6 +56,12 @@ public class DebugManager : MonoBehaviour
         text.text += "\n\nCamera:";
         text.text += "\nPosition:" + _camera.transform.position.ToString();
         text.text += "\nRotation:" + _camera.transform.rotation.ToString();
-        
+
+        text.text += "\n\nReticle Debug: ";
+        text.text += "\nLocked Targets: " + _reticle.locked_targets.Count;
+        text.text += "\nMax Targets: " + _reticle.getMaxTargets();
+        text.text += "\nTarget IDs: " + _reticle.locked_ids.ToString();
+        text.text += "\nTarget IDs Length: " + _reticle.locked_ids.Count;
+
     }
 }

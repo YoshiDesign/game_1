@@ -20,14 +20,12 @@ public class Player : MonoBehaviour
     private GameObject _homingPrefab;
     [SerializeField]
     private GameObject _reticle;
-    Reticle reticle;
+    Reticles reticle;
     PlayerInputActions playerInputActions;
 
     /**
      * Player state
      */
-    private Stack<GameObject> locked_targets;
-    public int missle_count = 2;            // Missle count determines max locked_targets
     private int lives = 3;
     private int basic_weapon;
     public int special_weapon;
@@ -98,7 +96,7 @@ public class Player : MonoBehaviour
 
         transform.position = new Vector3(0, 50, 0);
         shoot_laser_sound = transform.GetComponent<AudioSource>();
-        reticle = _reticle.GetComponent<Reticle>();
+        reticle = _reticle.GetComponent<Reticles>();
 
         gamepad = null;
         if (Gamepad.current != null) {
@@ -126,7 +124,6 @@ public class Player : MonoBehaviour
         }
 
     }
-
 
     public void CalculateMovement()
     {
@@ -266,12 +263,14 @@ public class Player : MonoBehaviour
     {
         if (special_weapon == UNASSIGNED) return;
 
-        if (special_weapon == HOMING && _homingCD < Time.time) {
-            for (int i = 0; i < missle_count; i++) {
+        if (special_weapon == HOMING && _homingCD < Time.time)
+        {
+            for (int i = 0; i < reticle.getMaxTargets(); i++)
+            {
                 GameObject clone = Instantiate(_homingPrefab, transform.position, Quaternion.identity);
                 HomingMissle hm = clone.GetComponent<HomingMissle>();
                 hm.num = i;
-                hm.target = locked_targets.Pop();
+                hm.target = reticle.locked_targets.Dequeue();
             }
             _homingCD = Time.time + _homingCD_time;
         }
@@ -287,7 +286,7 @@ public class Player : MonoBehaviour
     }
 
     /**
-     * Enable Special weapons
+     * ESpecial weapon function
      */
     public void enableHomingMissle()
     {
@@ -295,6 +294,5 @@ public class Player : MonoBehaviour
         special_weapon = HOMING;
         reticle.EnableHomingReticle();
     }
-
 
 }
