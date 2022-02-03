@@ -14,6 +14,8 @@ public class Reticles : MonoBehaviour
     Ray ray;
     Vector3 homing_reticle_ray;
 
+    Dictionary<int, GameObject> activeLockReticles;
+
     //private Vector3 reticle_vector_1_pos;
     private Vector3 reticle_vector_2_pos;
     private Vector3 reticle_vector_3_pos;
@@ -36,6 +38,7 @@ public class Reticles : MonoBehaviour
     {
         locked_targets = new Queue<Transform>();
         locked_ids = new List<int>();
+        activeLockReticles = new Dictionary<int, GameObject>(); // Instance ID: Reticle
 
         cam = _cam.GetComponent<Camera>();
         player = GameObject.Find("Player").GetComponent<Player>();
@@ -68,16 +71,13 @@ public class Reticles : MonoBehaviour
         {
             // Reticle screen position
             homing_reticle_default.position = reticle_vector_3_pos;
-
             LockOnTargets();
-            if (locked_ids.Count > 0)
-            {
-                TrackLocks();
-            }
-            else { 
-                // Remove reticles
-            }
         }
+    }
+
+    public void EnableHomingReticle()
+    {
+        homing_reticle_default.gameObject.SetActive(true);
     }
 
     private void LockOnTargets()
@@ -101,6 +101,7 @@ public class Reticles : MonoBehaviour
                 {
                     if (hit.transform.GetInstanceID() == locked_ids[i])
                     {
+                        Debug.Log("RETURN. 1");
                         tracked = true;
                         return; // target is already being tracked
                     }
@@ -109,7 +110,10 @@ public class Reticles : MonoBehaviour
                 //  If we already have max_targets locked
                 if (locked_targets.Count == max_targets && !tracked)
                 {
+                    Debug.Log("DESTROY");
                     // Remove the first queued
+                    Destroy(activeLockReticles[locked_ids[0]]);
+                    activeLockReticles.Remove(locked_ids[0]);
                     locked_targets.Dequeue();
                     locked_ids.RemoveAt(0);
                 }
@@ -126,32 +130,30 @@ public class Reticles : MonoBehaviour
 
     private void CreateLock(Transform target)
     {
-
-        GameObject clone = Instantiate(
+        Vector3 trackPoint = cam.WorldToScreenPoint(target.transform.position);
+        trackPoint.z = 0;
+        Debug.Log("Create...");
+        LockReticle clone = Instantiate(
             lockedReticlePrefab,
-            target.transform.position,
+            trackPoint,
             Quaternion.identity
-        );
+        ).GetComponent<LockReticle>();
 
-        clone.transform.parent = transform;
+        clone.GetComponent<LockReticle>();
 
-        addLockedOnTarget(clone.transform);
+        //LockReticle _lock_reticle = clone.GetComponent<LockReticle>();
+        clone.gameObject.transform.parent = transform;
+        clone.target = target;
 
+        addLockedOnTarget(target.transform, clone);
     }
 
-    private void TrackLocks()
-    { 
-        
-    }
-
-    public void EnableHomingReticle()
+    public void addLockedOnTarget(Transform target, LockReticle lock_reticle)
     {
-        homing_reticle_default.gameObject.SetActive(true);
-    }
-    public void addLockedOnTarget(Transform target)
-    {
-        locked_ids.Add(target.transform.GetInstanceID());
+        int iid = target.transform.GetInstanceID();
+        locked_ids.Add(iid);
         locked_targets.Enqueue(target);
+        activeLockReticles.Add(iid, lock_reticle.gameObject);
     }
 
     public void setMaxTargets(int n) {max_targets = n;}
