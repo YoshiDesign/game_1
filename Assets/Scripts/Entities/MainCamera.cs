@@ -10,7 +10,6 @@ public class MainCamera : MonoBehaviour
     private float height = 9.0f;
     private float radius = 40.0f;
     public float easing = 0.0f;
-    private Vector3 anchor;
 
     void Start()
     {
@@ -21,7 +20,6 @@ public class MainCamera : MonoBehaviour
 
         current_rotation = new Vector3(transform.eulerAngles.x, player.transform.eulerAngles.y, 0.0f);
         player = GameObject.Find("Player").GetComponent<Player>();
-        anchor = new Vector3();
 
         // Tilt the camera up. This sets our view and the X rotation doesn't change
     }

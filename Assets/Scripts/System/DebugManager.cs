@@ -61,8 +61,8 @@ public class DebugManager : MonoBehaviour
         _reticle = reticle.GetComponent<Reticles>();
         _player = player.GetComponent<Player>();
         _sys = gameSystem.GetComponent<GameSystem>();
-        _camera = camera.GetComponent<Camera>();
-        _main = camera.GetComponent<MainCamera>();
+        //_camera = camera.GetComponent<Camera>();
+        //_main = camera.GetComponent<MainCamera>();
     }
 
     // Update is called once per frame
@@ -72,10 +72,10 @@ public class DebugManager : MonoBehaviour
         Vector3 c_rotation = _player.current_rotation;
 
         text.text = "Direction: "    + _player.dir.ToString();
+        text.text += "\nVelocity: " + c_velocity.ToString();
         //text.text += "\nPos: "       + _player.transform.position.ToString();
         //text.text += "\nForward: " + _player.transform.forward;
         //text.text += "\nRotation: "  + c_rotation.ToString();
-        //text.text += "\nVelocity: "  + c_velocity.ToString();
         //text.text += "\nMomentum:"     + _player.momentum.ToString();
         text.text += "\nSpecial:"     + _player.special_weapon;
         text.text += "\nSpecial Level:" + _player.weapon_level_homingMissles;

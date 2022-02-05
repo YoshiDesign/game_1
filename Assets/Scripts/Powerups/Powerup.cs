@@ -6,9 +6,6 @@ using Custom;
 public class Powerup : MonoBehaviour
 {
 
-    [SerializeField]
-    private float max_distance = 3900.0f;
-
     private Player player;
 
     [SerializeField]

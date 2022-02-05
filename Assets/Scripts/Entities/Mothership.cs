@@ -33,7 +33,7 @@ public class Mothership : Enemy {
         facing_position.y = player_position.y;
         facing_position.z = transform.position.z;
 
-        velocity = new Vector3(Random.Range(-2f, 2f), 0.0f, Random.Range(-5f, -2f));
+        velocity = new Vector3(-0.5f, Random.Range(-2f, -1f), Random.Range(-2f, -1f));
         shoot_sound = transform.GetComponent<AudioSource>();
         transform.LookAt(facing_position); 
 
@@ -59,9 +59,11 @@ public class Mothership : Enemy {
     private IEnumerator shootAtPlayer()
     {
         while (true) {
-            yield return new WaitForSeconds(Random.Range(3, 10));
+            yield return new WaitForSeconds(Random.Range(3, 5));
             shoot();
-            velocity.z = Random.Range(-5f, -1f);
+            //velocity.z = Random.Range(-5f, -1f);
+            velocity.x = Random.Range(-1f, 1f);
+            velocity.y = Random.Range(-1f, 1f);
         }
     }
 

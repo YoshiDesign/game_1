@@ -27,20 +27,14 @@ public class Player : MonoBehaviour
     /**
      * Weapons
      */
-    int homing_missle_child_index_start = 0;
-    int homing_missle_child_index_end = 7;
-    bool all_homing_cooldowns_complete = true;
 
+    //bool all_homing_cooldowns_complete = true;
     HomingMissle[] allHomingMissles_0;
     HomingMissle[] allHomingMissles_1;
     HomingMissle[] allHomingMissles_2;
     HomingMissle[] activeHomingMissles;
-
-    int homing_group_1_index = 0;
-    int homing_group_2_index = 1;
     int max_missles = 8;
     public int weapon_level_homingMissles = 1;
-
 
     /**
      * Player state
@@ -48,11 +42,9 @@ public class Player : MonoBehaviour
     private int lives = 3;
     private int basic_weapon;
     public int special_weapon;
-    int missles_fired = 0;
 
     // Cooldowns
     private float _laserCD  = 0.0f;
-    private float _homingCD = 0.0f;
     public float _laserCD_time  = 0.5f;
     public float _homingCD_time = 3f;
 
