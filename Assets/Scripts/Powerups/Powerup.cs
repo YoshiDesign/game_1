@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Custom;
 
 public class Powerup : MonoBehaviour
 {
@@ -35,7 +36,10 @@ public class Powerup : MonoBehaviour
             // Determine which powerup to enable
             switch (this.tag) {
 
-                case "homing_missle_powerup": player.enableHomingMissle(); break;
+                case "homing_missle_powerup": 
+                    if (player.weapon_level_homingMissles < 8)
+                        player.upgradeHomingMissle(player.weapon_level_homingMissles * 2); // Dont ask
+                    break;
 
                 default:
                     print("Default Powerup");

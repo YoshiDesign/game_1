@@ -22,7 +22,7 @@ public class EnemySystem : MonoBehaviour
     public IEnumerator SpawnMothership()
     {
         while (true) { 
-            Instantiate(mothership, new Vector3(Random.Range(400, 800), Random.Range(150, 1000), max_spawn_distance), Quaternion.Inverse(Quaternion.identity));
+            Instantiate(mothership, new Vector3(Random.Range(-1400, 2000), Random.Range(50, 1000), max_spawn_distance), Quaternion.Inverse(Quaternion.identity));
             yield return new WaitForSeconds(Random.Range(1, 5));
         }
     }

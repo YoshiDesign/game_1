@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Custom;
 
 public class Player : MonoBehaviour
 {
@@ -15,13 +16,31 @@ public class Player : MonoBehaviour
      * Composition stuff
      */
     [SerializeField]
-    private GameObject _laserPrefab;
+    private GameObject _homing_missles;
     [SerializeField]
-    private GameObject _homingPrefab;
+    private GameObject _laserPrefab;
     [SerializeField]
     private GameObject _reticle;
     Reticles reticle;
     PlayerInputActions playerInputActions;
+
+    /**
+     * Weapons
+     */
+    int homing_missle_child_index_start = 0;
+    int homing_missle_child_index_end = 7;
+    bool all_homing_cooldowns_complete = true;
+
+    HomingMissle[] allHomingMissles_0;
+    HomingMissle[] allHomingMissles_1;
+    HomingMissle[] allHomingMissles_2;
+    HomingMissle[] activeHomingMissles;
+
+    int homing_group_1_index = 0;
+    int homing_group_2_index = 1;
+    int max_missles = 8;
+    public int weapon_level_homingMissles = 1;
+
 
     /**
      * Player state
@@ -29,6 +48,7 @@ public class Player : MonoBehaviour
     private int lives = 3;
     private int basic_weapon;
     public int special_weapon;
+    int missles_fired = 0;
 
     // Cooldowns
     private float _laserCD  = 0.0f;
@@ -89,8 +109,29 @@ public class Player : MonoBehaviour
 
     void Start()
     {
+
+        /**
+         * TODO
+         * Combine with homing missle Queue instantiation in Player class
+         */
+        allHomingMissles_0 = new HomingMissle[Helpers.HOMING_L0];
+        allHomingMissles_1 = new HomingMissle[Helpers.HOMING_L1];
+        allHomingMissles_2 = new HomingMissle[Helpers.HOMING_L2];
+
+        for (int i = 0; i < max_missles; i++)
+        {
+            if (i < Helpers.HOMING_L0) { 
+                allHomingMissles_0[i] = _homing_missles.transform.GetChild(i).gameObject.GetComponent<HomingMissle>();
+            }
+            if (i < Helpers.HOMING_L1) { 
+                allHomingMissles_1[i] = _homing_missles.transform.GetChild(i).gameObject.GetComponent<HomingMissle>();
+            }
+            if (i < Helpers.HOMING_L2) { 
+                allHomingMissles_2[i] = _homing_missles.transform.GetChild(i).gameObject.GetComponent<HomingMissle>();
+            }
+        }
+
         dir = new Vector2(0f, 0f);
-        
         basic_weapon   = LASER;
         special_weapon = UNASSIGNED;
 
@@ -103,6 +144,9 @@ public class Player : MonoBehaviour
             Debug.Log("Gamepad Detected");
             gamepad = Gamepad.current;
         }
+
+        activeHomingMissles = allHomingMissles_0;
+
     }
 
     private void Update()
@@ -250,8 +294,35 @@ public class Player : MonoBehaviour
     }
 
     /**
-     * Shoot Weapons
+     * Weapons
      */
+    // Upgrading Homing missles. SHould be renamed to setHomingMissleLevel
+    public void upgradeHomingMissle(int n)
+    {
+        weapon_level_homingMissles = n;
+        if (special_weapon == UNASSIGNED) {
+            enableHomingMissle();
+        }
+
+        activeHomingMissles = new HomingMissle[n];
+        /**
+         * TODO: Find out if these are instantiated by ref || value
+         */
+        switch (n)
+        {
+            case Helpers.HOMING_L0:
+                activeHomingMissles = allHomingMissles_0;
+                break;
+            case Helpers.HOMING_L1:
+                activeHomingMissles = allHomingMissles_1;
+                break;
+            case Helpers.HOMING_L2:
+                activeHomingMissles = allHomingMissles_2;
+                break;
+        }
+
+        reticle.upgradeHomingMissle(n);
+    }
     public void shootBasic(InputAction.CallbackContext ctx)
     {
         if (basic_weapon == LASER && _laserCD < Time.time) {
@@ -263,18 +334,34 @@ public class Player : MonoBehaviour
     {
         if (special_weapon == UNASSIGNED) return;
 
-        if (special_weapon == HOMING && _homingCD < Time.time)
+        if (special_weapon == HOMING && reticle.locked_targets.Count > 0)
         {
-            for (int i = 0; i < reticle.getMaxTargets(); i++)
+            /**
+             * TODO: Wonder optimization
+             */
+            for (int i = 0, missles_fired = 0; i < Helpers.getMaxHomingTargets(); i++)
             {
-                GameObject clone = Instantiate(_homingPrefab, transform.position, Quaternion.identity);
-                HomingMissle hm = clone.GetComponent<HomingMissle>();
-                hm.num = i;
-                hm.target = reticle.locked_targets.Dequeue();
-            }
-            _homingCD = Time.time + _homingCD_time;
-        }
+                if (activeHomingMissles[i]._cooldown > Time.time) {
+                    continue;
+                }
+                else // Fire ze missile
+                {
 
+                    //all_homing_cooldowns_complete = false;
+                    activeHomingMissles[i].target = reticle.locked_targets.Dequeue();
+                    reticle.locked_targets.Enqueue(activeHomingMissles[i].target);
+                    activeHomingMissles[i].gameObject.SetActive(true);
+                    missles_fired++;
+
+                    // Stop shooting once every target is accounted for, even if we have more missles left
+                    if (missles_fired + 1 > reticle.locked_targets.Count)
+                    {
+                        break;
+                    }
+
+                }
+            }
+        }
     }
     private IEnumerator shoot_triple_laser()
     {
@@ -286,7 +373,7 @@ public class Player : MonoBehaviour
     }
 
     /**
-     * ESpecial weapon function
+     * Special weapon function
      */
     public void enableHomingMissle()
     {

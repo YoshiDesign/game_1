@@ -7,6 +7,7 @@ public class LockReticle : MonoBehaviour
 {
     public int index;
     public Transform target;
+
     private RawImage _image;
     public Vector3 rotation;
     private Vector3 trackPoint;
@@ -22,6 +23,7 @@ public class LockReticle : MonoBehaviour
         //Debug.Log("Reticle Active. Target Dist: " + target.position.z);
         //float target_z = Mathf.Min(3000 / target.position.z, 3.0f);
         rotation = new Vector3(0, 0, 30.0f * Time.deltaTime);
+
         //_image = transform.GetComponent<RawImage>();
         //Debug.Log(_image.rectTransform.ToString());
         //Debug.Log(_image.rectTransform.sizeDelta);
@@ -34,9 +36,16 @@ public class LockReticle : MonoBehaviour
         transform.Rotate(rotation, Space.Self);
     }
 
+    private void OnDisable()
+    {
+        Debug.Log("NULLIFYING TARGET");
+        target = null;
+    }
+
     private void FixedUpdate()
     {
         if (target == null) {
+            transform.parent.GetComponent<Reticles>().ShuffleTargetQueue();
             this.gameObject.SetActive(false);
             return;
         }

@@ -6,6 +6,7 @@ public class Mothership : Enemy {
 
     [SerializeField]
     private GameObject laser;
+    [SerializeField]
     private Transform player;
 
     AudioSource shoot_sound;
