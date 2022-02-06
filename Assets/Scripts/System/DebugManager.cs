@@ -77,8 +77,7 @@ public class DebugManager : MonoBehaviour
         //text.text += "\nForward: " + _player.transform.forward;
         //text.text += "\nRotation: "  + c_rotation.ToString();
         //text.text += "\nMomentum:"     + _player.momentum.ToString();
-        text.text += "\nSpecial:"     + _player.special_weapon;
-        text.text += "\nSpecial Level:" + _player.weapon_level_homingMissles;
+        text.text += "\nWeap:" + _player.special_weapon + "-" + _player.weapon_level_homingMissles;
 
         //text.text += "\n\nTouch Debug: ";
         //text.text += "\n\nCamera:";
@@ -103,38 +102,21 @@ public class DebugManager : MonoBehaviour
         homing_8cd = homing_8._cooldown > Time.time ? "|" : "O";
 
         text.text += "\n1: " + homing_1cd + "\tTarget:" + homing_1.debug_id;
-        text.text += "\nDelta: " + homing_1.rot_amt;
-        text.text += "\nForward: " + homing_1.transform.forward;
-        text.text += "\nV: " + homing_1.velocity;
-        text.text += "\nD: " + homing_1.direction;
+
         text.text += "\n2: " + homing_2cd + "\tTarget:" + homing_2.debug_id;
-        text.text += "\nDelta: " + homing_2.rot_amt;
-        text.text += "\nV: " + homing_2.velocity;
-        text.text += "\nD: " + homing_2.direction;
+
         text.text += "\n3: " + homing_3cd + "\tTarget:" + homing_3.debug_id;
-        text.text += "\nDelta: " + homing_3.rot_amt;
-        text.text += "\nV: " + homing_3.velocity;
-        text.text += "\nD: " + homing_3.direction;
+
         text.text += "\n4: " + homing_4cd + "\tTarget:" + homing_4.debug_id;
-        text.text += "\nDelta: " + homing_4.rot_amt;
-        text.text += "\nV: " + homing_4.velocity;
-        text.text += "\nD: " + homing_4.direction;
+
         text.text += "\n5: " + homing_5cd + "\tTarget:" + homing_5.debug_id;
-        text.text += "\nDelta: " + homing_5.rot_amt;
-        text.text += "\nV: " + homing_5.velocity;
-        text.text += "\nD: " + homing_5.direction;
+
         text.text += "\n6: " + homing_6cd + "\tTarget:" + homing_6.debug_id;
-        text.text += "\nDelta: " + homing_6.rot_amt;
-        text.text += "\nV: " + homing_6.velocity;
-        text.text += "\nD: " + homing_6.direction;
+ 
         text.text += "\n7: " + homing_7cd + "\tTarget:" + homing_7.debug_id;
-        text.text += "\nDelta: " + homing_7.rot_amt;
-        text.text += "\nV: " + homing_7.velocity;
-        text.text += "\nD: " + homing_7.direction;
+
         text.text += "\n8: " + homing_8cd + "\tTarget:" + homing_8.debug_id;
-        text.text += "\nDelta: " + homing_8.rot_amt;
-        text.text += "\nV: " + homing_8.velocity;
-        text.text += "\nD: " + homing_8.direction;
+
 
     }
 

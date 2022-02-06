@@ -23,10 +23,10 @@ public class Laser : MonoBehaviour
 
         if (   transform.position.z > Helpers.max_dist
             || transform.position.z < 0
-            || transform.position.x < -2000.0f
-            || transform.position.x > 2000.0f
+            || transform.position.x < -5000.0f
+            || transform.position.x > 5000.0f
             || transform.position.y < 0
-            || transform.position.y > 2000.0f)
+            || transform.position.y > 5000.0f)
         {
             Destroy(gameObject);
         }

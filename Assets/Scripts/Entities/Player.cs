@@ -169,11 +169,11 @@ public class Player : MonoBehaviour
         getMomentum();
         checkBounds();
 
-        current_velocity.y = (((momentum.y) / max_Y_momentum) * speedY) * Time.deltaTime;
-        current_velocity.x = (((momentum.x) / max_X_momentum) * speedX) * Time.deltaTime;
+        current_velocity.y = (((momentum.y) / max_Y_momentum) * speedY);
+        current_velocity.x = (((momentum.x) / max_X_momentum) * speedX);
    
         transform.localEulerAngles = new Vector3(current_rotation.x, current_rotation.y, current_rotation.z);
-        transform.Translate(current_velocity, Space.World);
+        transform.Translate(current_velocity * Time.deltaTime, Space.World);
 
     }
 
@@ -329,7 +329,7 @@ public class Player : MonoBehaviour
         if (special_weapon == HOMING && reticle.locked_targets.Count > 0)
         {
             /**
-             * TODO: Wonder optimization
+             * TODO: Wonder about optimizations
              */
             for (int i = 0, missles_fired = 0; i < Helpers.getMaxHomingTargets(); i++)
             {

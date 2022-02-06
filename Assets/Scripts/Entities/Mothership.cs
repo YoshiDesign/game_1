@@ -44,7 +44,14 @@ public class Mothership : Enemy {
     protected override void Update()
     {
         // Check if we should destroy this game object
-        if (transform.position.z < -100.0f || transform.position.z > 5000.0f)
+        if (
+            transform.position.z < -10f 
+            || transform.position.z > 5000f 
+            || transform.position.x > 2700f
+            || transform.position.x < -2700f
+            || transform.position.y < 0f
+            || transform.position.y > 1100f
+            )
         {
             Destroy(this.gameObject);
         }

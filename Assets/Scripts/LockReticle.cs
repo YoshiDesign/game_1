@@ -16,18 +16,11 @@ public class LockReticle : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        print("LOCK RETICLE STARTING");
         // TODO - Optimize this. Find out how to convert world to screen space manually
         // At least just for the x and y coords.
         cam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
-        //Debug.Log("Reticle Active. Target Dist: " + target.position.z);
-        //float target_z = Mathf.Min(3000 / target.position.z, 3.0f);
         rotation = new Vector3(0, 0, 30.0f * Time.deltaTime);
 
-        //_image = transform.GetComponent<RawImage>();
-        //Debug.Log(_image.rectTransform.ToString());
-        //Debug.Log(_image.rectTransform.sizeDelta);
-        //_image.rectTransform.sizeDelta = new Vector2(target_z, target_z);
     }
 
     // Update is called once per frame
@@ -38,14 +31,16 @@ public class LockReticle : MonoBehaviour
 
     private void OnDisable()
     {
-        Debug.Log("NULLIFYING TARGET");
         target = null;
     }
 
     private void FixedUpdate()
     {
-        if (target == null) {
+        // Target was destroyed or otherwise out of play
+        if (target == null || target.transform.position.z < -1f) {
+            // Recreate the target queues (taret_ids and targets)
             transform.parent.GetComponent<Reticles>().ShuffleTargetQueue();
+            // Hide this reticle
             this.gameObject.SetActive(false);
             return;
         }

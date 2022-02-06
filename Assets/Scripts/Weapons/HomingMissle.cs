@@ -11,44 +11,42 @@ public class HomingMissle : MonoBehaviour
      */ 
 
     public Vector3 velocity;
+    public Vector3 distance;
     Vector3 armed_velocity;
     Vector3 initial_velocity;
-    Vector3 rotation;
-    Vector3 start_pos;
-    Vector3 offset_pos;
     Vector3 tracking_vector;
     Vector3 spinning_aimlessly;
     Vector3 random_vector;
-    public Vector3 direction;
     RaycastHit hit;
 
     [SerializeField]
-    private int sensitivity = 360;
-
-    AudioSource explode_sound;
+    private int spin = 360;
     public GameObject explosionEffect;
-
     [SerializeField]
     GameObject player;
     Player _player;
     [SerializeField]
     private Transform missle;
+       
     public float _cooldown = 0.0f;
     public float _destroy = 0.0f;
-    private float cooldown_time = 10.0f;
-    private float destroy_time = 8.0f;
+    private float cooldown_time = 15.0f;
+    private float destroy_time = 14.0f;
     public int debug_id;
+    private float fire_wait = 2f;                  // Each missle waits a small but random amount of time before it arms
     public Vector3 rot_amt;
-    [SerializeField]
-    private float speed = 325f;
+
+    private float speed = 725f;
     int ro;
     int off;
     private bool tracking = false;
     bool destroyed = false;
 
-    // num tells us which side to reset the missle to
+    // num tells us which side the missle should spawn from initially and its initial V
     public int num;
+
     public Transform target;
+    AudioSource explode_sound;
 
     /**
      * TODO:
@@ -63,29 +61,20 @@ public class HomingMissle : MonoBehaviour
 
     void Start()
     {
-        tracking_vector     = new Vector3(0, 0, Vector3.forward.z);
-        spinning_aimlessly  = new Vector3(540, 360, 0);
-        start_pos           = new Vector3(num * 1.5f, 0, 0);
+        tracking_vector     = new Vector3(0, 0, Vector3.forward.z);     // Cross product driven
         armed_velocity      = new Vector3(0, 0, speed);
-        initial_velocity    = new Vector3(0, 15.0f, 0.0f);
-        rotation            = new Vector3(0, 0, 900.0f);
+        initial_velocity    = new Vector3(num * 3.2f, 5.0f, 0.0f);
         random_vector = new Vector3(Random.Range(0, 300), Random.Range(0, 300), Random.Range(0, 300));
-
-        // Left or right side
-        off = Mathf.Abs(num) / num;
+        velocity = initial_velocity;
 
         // Random spin direction before the missle is armed
         ro = Random.Range(0, 1);
         ro = ro != 0 ? ro : -1;
+        spinning_aimlessly  = new Vector3(540f, 360f, 0) * ro;
     }
     private void OnEnable()
     {
-        Cooldown(); 
-        velocity = initial_velocity;
-        transform.GetChild(0).gameObject.SetActive(true);
-
-        // spawn at the player's position
-        transform.position = _player.transform.position;
+        //velocity = initial_velocity;
 
         // Arm the missle and start the cooldown
         StartCoroutine(ArmMissle());
@@ -98,18 +87,24 @@ public class HomingMissle : MonoBehaviour
     {
         // Reset the forward norm
         transform.forward = Vector3.forward;
+        velocity = initial_velocity;
         tracking = false;
     }
 
     public IEnumerator ArmMissle()
     {
-        yield return new WaitForSeconds(2);
-        missle.Rotate(new Vector3(45f, 0f, 0f));
+        Cooldown();
+        transform.position = _player.transform.position;
+        transform.GetChild(0).gameObject.SetActive(true);
+        
+        yield return new WaitForSeconds(fire_wait);
+
         if (target != null)
         {
             tracking = true;
 
             // Aim at target and fire
+            missle.LookAt(target.position);
             transform.LookAt(target.position);
         }
 
@@ -119,17 +114,18 @@ public class HomingMissle : MonoBehaviour
 
     private void FixedUpdate()
     {
-        transform.Translate(velocity * Time.deltaTime);
+        
         if (target != null)
         {
-
             if (!tracking)
             {
+                print("V: " + velocity.ToString());
+                transform.Translate(velocity * Time.deltaTime);
                 // The missle spins aimlessly when it's first ejected, ro is -1 || 1 to really spice things up
-                missle.Rotate(spinning_aimlessly * ro * Time.deltaTime, Space.Self);
+                missle.Rotate(spinning_aimlessly * Time.deltaTime, Space.World);
             } 
             else {
-                
+                transform.Translate(velocity * Time.deltaTime, Space.Self);
                 // The missle spins around the Z as it travels to its target
                 missle.Rotate(new Vector3(0, 900 * Time.deltaTime, 0));
                 trackTarget();
@@ -150,6 +146,8 @@ public class HomingMissle : MonoBehaviour
 
         }
         else {
+            // Lost it's target, keep moving
+            transform.Translate(velocity * Time.deltaTime);
             debug_id = 0;
         }
 
@@ -179,22 +177,22 @@ public class HomingMissle : MonoBehaviour
 
     public void trackTarget()
     {
-        direction = target.position - transform.position;
+        distance = target.position - transform.position;
 
-        if (direction.z < 100.0f) // Now yer fucked
+        if (distance.z < 500.0f) // Now yer fucked
         {
             transform.LookAt(target.position, transform.forward);
         }
         else { 
 
-            direction.Normalize();
+            distance.Normalize();
 
-            rot_amt = Vector3.Cross(direction, transform.forward);//.magnitude;
+            rot_amt = Vector3.Cross(distance, transform.forward);//.magnitude;
             tracking_vector.x = rot_amt.x;
             tracking_vector.y = rot_amt.y;
 
             //tracking_vector.z = rot_amt.z;
-            transform.Rotate(tracking_vector * sensitivity * Time.deltaTime * -1);
+            transform.Rotate(tracking_vector * spin * Time.deltaTime * -1);
 
         }
 

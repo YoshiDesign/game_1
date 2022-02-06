@@ -135,7 +135,7 @@ public class Reticles : MonoBehaviour
         // This ray is constantly tracing a + pattern in reticle_3
         ray = cam.ScreenPointToRay(reticle_vector_3_pos + init_raycast_targetlock_offset + dynamic_raycast_targetlock_offset);
 
-        Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
+        //Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
 
         // Add targets to locked_targets <Queue>
         if (Physics.Raycast(ray, out hit))
@@ -155,8 +155,6 @@ public class Reticles : MonoBehaviour
                     }
                 }
 
-                Debug.Log("Tracked ??? " + tracked.ToString());
-
                 //  If we already have Helpers.max_homing_targets locked
                 if (locked_targets.Count == Helpers.getMaxHomingTargets() && !tracked)
                 {
@@ -164,10 +162,10 @@ public class Reticles : MonoBehaviour
                     // This emulates Dequeue -> Enqueue with less overhead
                     Transform replace_lock_reticle = activeLockReticleQueue.Peek();
                     replace_lock_reticle.gameObject.SetActive(false);   // This will also set this reticle's target to null, which is excruciatingly necessary for the succes of CreateLock()
-                    Debug.Log("COUNT =BEFORE= MAX: locked_ids Length = " + locked_ids.Length);
+                    
                     locked_targets.Dequeue(); // This queue is tracking all currently locked on enemies but is currently unused.
                     locked_ids = new ArraySegment<int>(locked_ids, 1, locked_ids.Length - 1).Array; // Pop off the front (dequeue)
-                    Debug.Log("COUNT =AFTER= MAX: locked_ids Length = " + locked_ids.Length);
+                    
                 }
                 CreateLock(hit.transform);
             }
@@ -179,7 +177,6 @@ public class Reticles : MonoBehaviour
     */
     public void upgradeHomingMissle(int n)
     {
-        Debug.Log("Upgrading. New Length = " + n);
         Helpers.setMaxHomingTargets(n);
 
         if (locked_targets.Count > 0)
@@ -191,7 +188,7 @@ public class Reticles : MonoBehaviour
             foreach (Transform tar in locked_targets)
             {
                 locked_ids[i] = tar.GetInstanceID();
-                Debug.Log("Migrating UUID: " + locked_ids[i]);
+                
                 i++;
             }
         }
