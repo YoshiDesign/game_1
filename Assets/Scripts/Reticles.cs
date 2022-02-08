@@ -93,7 +93,7 @@ public class Reticles : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
         
         //reticle_vector_1_pos = cam.WorldToScreenPoint(player.reticle_vector_1);
@@ -107,6 +107,10 @@ public class Reticles : MonoBehaviour
         laser_reticle_2.position = reticle_vector_2_pos;
         laser_reticle_3.position = reticle_vector_3_pos;
 
+    }
+
+    private void Update()
+    {
         if (homing_reticle_default.gameObject.activeSelf)
         {
             // Reticle screen position
@@ -114,7 +118,6 @@ public class Reticles : MonoBehaviour
             LockOnTargets();
         }
     }
-
 
     private void FixedUpdate()
     {

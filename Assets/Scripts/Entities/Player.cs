@@ -42,6 +42,8 @@ public class Player : MonoBehaviour
     private int lives = 3;
     private int basic_weapon;
     public int special_weapon;
+    public Vector3 thrust = new Vector3(0,0,500f);
+    public float thrust_rate = 15.0f;
 
     // Cooldowns
     private float _laserCD  = 0.0f;
@@ -101,7 +103,6 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-
         /**
          * TODO
          * Combine with homing missle Queue instantiation in Player class
@@ -283,6 +284,17 @@ public class Player : MonoBehaviour
 
         return angle + ((magnitude) * tilt_speed * Time.deltaTime);
 
+    }
+
+    // Thrust  up
+    private void accelerate()
+    {
+        if (thrust.z < 5500) { thrust.z += (thrust_rate * Time.deltaTime);  }
+    }
+
+    // Thrust down
+    private void decelerate() {
+        if (thrust.z > 50) { thrust.z -= (thrust_rate * Time.deltaTime); }
     }
 
     /**

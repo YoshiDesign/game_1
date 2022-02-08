@@ -33,9 +33,6 @@ public class GameSystem : MonoBehaviour
      */
     [SerializeField]
     private GameObject debris;
-    [SerializeField]
-    private GameObject _terrainRowPrefab;
-    private Queue<GameObject> rows = new Queue<GameObject>();
     private GameObject[] rowsAsArray;
 
     /**
@@ -93,23 +90,23 @@ public class GameSystem : MonoBehaviour
 
         _isGameOver = false;
 
-        // Begin terrain rows
-        for (int i = 0; i < numTerrainRows; i++) {
-            rows.Enqueue(Instantiate(_terrainRowPrefab, new Vector3(0, 0, (i * 1000)), Quaternion.identity));
-        }
+        //// Begin terrain rows
+        //for (int i = 0; i < numTerrainRows; i++) {
+        //    rows.Enqueue(Instantiate(_terrainRowPrefab, new Vector3(0, 0, (i * 1000)), Quaternion.identity));
+        //}
 
         // Begin space debris
         if (current_level == SPACE) {
             for (int i = 0; i < Random.Range(5, 10); i++)
             {
-                for (int j = 0; j < Random.Range(5, 10); j++)
+                for (int j = 0; j < Random.Range(10, 15); j++)
                 {
                     Instantiate(
                         debris,
                         new Vector3(
-                            (float)Random.Range(-2000, 2000),
+                            (float)Random.Range(-8000, 8000),
                             (float)Random.Range(0, 2000),
-                            max_spawn_distance + Random.Range(0, 1000)),
+                            max_spawn_distance + Random.Range(0, 5000)),
                         Quaternion.identity);
                 }
             }
@@ -122,9 +119,9 @@ public class GameSystem : MonoBehaviour
 
     private void Update()
     {
-        if (rows.Peek() == null) {
-            CreateTerrainRow();
-        }
+        //if (rows.Peek() == null) {
+        //    CreateTerrainRow();
+        //}
     }
 
     public IEnumerator SpawnPowerup()
@@ -187,22 +184,18 @@ public class GameSystem : MonoBehaviour
         return true;
     }
 
-    public void CreateTerrainRow() {
-        // Remove from the queue
-        rows.Dequeue();
-        // Turn queue into array so we can access the last in line
-        rowsAsArray = rows.ToArray();
-        // Spawn the next row beginning exactly where the previous last in line left off
-        rows.Enqueue(Instantiate(_terrainRowPrefab, new Vector3(0, 0, rowsAsArray[rowsAsArray.Length - 1].transform.position.z + 1000), Quaternion.identity));
-    }
+    //public void CreateTerrainRow() {
+    //    // Remove from the queue
+    //    rows.Dequeue();
+    //    // Turn queue into array so we can access the last in line
+    //    rowsAsArray = rows.ToArray();
+    //    // Spawn the next row beginning exactly where the previous last in line left off
+    //    rows.Enqueue(Instantiate(_terrainRowPrefab, new Vector3(0, 0, rowsAsArray[rowsAsArray.Length - 1].transform.position.z + 1000), Quaternion.identity));
+    //}
 
     public void GameOver()
     {
         _isGameOver = true;
     }
 
-    void OnGui()
-    {
-        // common GUI code goes here
-    }
 }

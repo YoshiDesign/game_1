@@ -4,16 +4,26 @@ using UnityEditor;
 public class TerrainRow : MonoBehaviour
 {
 
+    [SerializeField]
+    GameObject followingTerrain;
+    [SerializeField]
+    GameObject player;
+    Player _player;
+
     public int depth = 20;
     public int width = 1024;
     public int height = 1024;
     public float scale = 22.0f;
 
-    public Vector3 proceed_speed = new Vector3(0, 0, -1500.0f);
-    public float cutoff_distance = -1050.0f;
-    // Start is called before the first frame update
+    [SerializeField]
+    public Vector3 followingStartPosition = new Vector3(0, 0, 9980f);
+    public Vector3 proceed_speed = new Vector3(0, 0, -1000.0f);
+    public Vector3 thrust_vector = new Vector3(0, 0, 0);
+    public float cutoff_distance = -9980.0f;
+
     void Start()
     {
+        _player = player.GetComponent<Player>();
         //terrain = transform.GetComponent<Terrain>();
         //terrain.terrainData = GenerateTerrain(terrain.terrainData);
     }
@@ -26,7 +36,7 @@ public class TerrainRow : MonoBehaviour
 
     void proceed()
     {
-        transform.Translate(proceed_speed * Time.deltaTime);
+        transform.Translate((proceed_speed - _player.thrust) * Time.deltaTime);
         update_grid();
     }
 
@@ -34,8 +44,8 @@ public class TerrainRow : MonoBehaviour
     {
         // The tile is behind the player's fov
         if (transform.position.z < cutoff_distance)
-        { 
-            Destroy(gameObject);
+        {
+            transform.position = followingTerrain.transform.position + followingStartPosition;
         }
 
     }

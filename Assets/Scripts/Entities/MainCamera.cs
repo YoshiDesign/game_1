@@ -28,7 +28,8 @@ public class MainCamera : MonoBehaviour
     {
 
     }
-    private void FixedUpdate()
+
+    private void LateUpdate()
     {
 
         // Loose Camera
