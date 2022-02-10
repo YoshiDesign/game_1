@@ -2,6 +2,12 @@
 namespace Custom {
 
     class Helpers {
+
+        // Camera modes
+        public const int FIRST_PERSON = 1;
+        public const int THIRD_PERSON = 2;
+
+        // Homing missle
         public const int HOMING_L0 = 2;
         public const int HOMING_L1 = 4;
         public const int HOMING_L2 = 8;

@@ -19631,6 +19631,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1224983777}
+  mousePos: {x: 0, y: 0}
   easing: 0
 --- !u!114 &1050952407
 MonoBehaviour:
@@ -31413,7 +31414,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1428022354
 RectTransform:
   m_ObjectHideFlags: 0
