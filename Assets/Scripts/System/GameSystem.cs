@@ -90,11 +90,6 @@ public class GameSystem : MonoBehaviour
 
         _isGameOver = false;
 
-        //// Begin terrain rows
-        //for (int i = 0; i < numTerrainRows; i++) {
-        //    rows.Enqueue(Instantiate(_terrainRowPrefab, new Vector3(0, 0, (i * 1000)), Quaternion.identity));
-        //}
-
         // Begin space debris
         if (current_level == SPACE) {
             for (int i = 0; i < Random.Range(5, 10); i++)
@@ -114,6 +109,7 @@ public class GameSystem : MonoBehaviour
 
         StartCoroutine(SpawnAsteroid());
         StartCoroutine(SpawnPowerup());
+        StartCoroutine(spawnLargeAsteroid());
 
     }
 
@@ -146,7 +142,6 @@ public class GameSystem : MonoBehaviour
             int v = Random.Range(0, ASTEROID_COUNT + 1);
 
             // Increment to 10
-
             if (v < LARGE_ASTEROID) // Within the array of small asteroids
             {
                 asteroid_count[v] = asteroid_count[v] < 10 ? asteroid_count[v] + 1 : asteroid_count[v];
@@ -154,34 +149,22 @@ public class GameSystem : MonoBehaviour
                 _asteroid = clone.GetComponent<Asteroid>();
                 _asteroid.type = v;
             }
-            else if (spawnLargeAsteroid())
-            {
-                GameObject clone = Instantiate(largeAsteroid, new Vector3(0, 3000.0f, max_distance), Quaternion.identity);
-                _large_asteroid = clone.GetComponent<LargeAsteroid>();
-                _large_asteroid.type = v;
-            }
  
-            yield return new WaitForSeconds(Random.Range(2f, 5f));
+            yield return new WaitForSeconds(Random.Range(2, 5));
         }
 
     }
     /**
      * Spawn a large asteroid when we've spawned a number of every other time
      */
-    private bool spawnLargeAsteroid()
+    private IEnumerator spawnLargeAsteroid()
     {
-
-        for (int i = 0; i < asteroid_count.Length; i++)
-        {
-            if (asteroid_count[i] < 5) { 
-                return false;
-            }
+        for (; ; ) { 
+            GameObject clone = Instantiate(largeAsteroid, new Vector3(0, 3000.0f, max_distance), Quaternion.identity);
+            _large_asteroid = clone.GetComponent<LargeAsteroid>();
+            yield return new WaitForSeconds(Random.Range(8, 35));
         }
 
-        // Reset the asteroid count
-        asteroid_count = new int[ASTEROID_COUNT];
-
-        return true;
     }
 
     //public void CreateTerrainRow() {

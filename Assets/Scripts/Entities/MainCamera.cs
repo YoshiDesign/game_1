@@ -18,7 +18,7 @@ public class MainCamera : MonoBehaviour
     private float height = 9.0f;
     private float radius = 40.0f;
     public float easing = 0.0f;
-    private int camera_mode = Helpers.FIRST_PERSON;
+    private int camera_mode = Helpers.THIRD_PERSON;
     private int update_mod = 0;
 
     void Start()
@@ -35,11 +35,9 @@ public class MainCamera : MonoBehaviour
         ctry = Screen.width / 2;
 
 
-
-
     }
 
-    void Update()
+    void Update() 
     {
         // Recollect the center of the screen every second or so
         update_mod++;
@@ -56,11 +54,11 @@ public class MainCamera : MonoBehaviour
     private void LateUpdate()
     {
 
-
         if (camera_mode == Helpers.FIRST_PERSON) {
 
-            current_rotation.x = mousePos.x - ctrx;
-            current_rotation.y = mousePos.y - ctry;
+            //current_rotation.x = mousePos.x - ctrx;
+            //current_rotation.y = mousePos.y - ctry;
+            current_rotation.x = 0;
             transform.localEulerAngles = current_rotation;
             transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z + 20);
 
